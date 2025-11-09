@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "879846769995",
+    "project_id": "trailtogether-v01",
+    "storage_bucket": "trailtogether-v01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879846769995:android:17f1286cb2146dcc0e94ce",
+        "android_client_info": {
+          "package_name": "com.example.trailtogether_v01"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "879846769995-7qncijtt7bpjm832cvi2b105cvdc78ct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsjcSb4o5x3gX1CPcLqYucTsWnEBCYnZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "879846769995-7qncijtt7bpjm832cvi2b105cvdc78ct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
