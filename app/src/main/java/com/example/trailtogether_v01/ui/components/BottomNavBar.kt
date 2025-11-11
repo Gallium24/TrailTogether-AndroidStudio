@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,54 +36,62 @@ fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
-        containerColor = Color(0xFFD4C5A0),
-        modifier = Modifier.height(80.dp)
-    ) {
-        items.forEachIndexed { index, item ->
-            val isSelected = currentRoute == item.route
-            val isCenter = index == 1
+    Column {
+        NavigationBar(
+            containerColor = Color(0xFFD4C5A0),
+            modifier = Modifier.height(110.dp)
+        ) {
+            items.forEachIndexed { index, item ->
+                val isSelected = currentRoute == item.route
+                val isCenter = index == 1
 
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            popUpTo(Screen.Home.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                NavigationBarItem(
+                    selected = isSelected,
+                    onClick = {
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(Screen.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
-                    }
-                },
-                icon = {
-                    if (isCenter) {
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .background(TrailGreen, shape = CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
+                    },
+                    icon = {
+                        if (isCenter) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight() // Remplit toute la hauteur disponible
+                                    .aspectRatio(1f) // Force la largeur à être égale à la hauteur, créant un carré
+                                    .background(
+                                        TrailGreen,
+                                        shape = CircleShape
+                                    ), // Le carré devient un cercle parfait
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        } else {
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                tint = Color.White,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         }
-                    } else {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.label,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = TrailGreen,
-                    unselectedIconColor = Color.Gray,
-                    indicatorColor = Color.Transparent
+                    },
+                    label = { if (!isCenter) Text(item.label) }, // Ne pas afficher de label pour le bouton central
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = TrailGreen,
+                        unselectedIconColor = Color.Gray,
+                        indicatorColor = Color.Transparent
+                    )
                 )
-            )
+            }
         }
+
     }
 }

@@ -48,48 +48,42 @@ android {
 }
 
 dependencies {
+    // Dépendances de base - gardons les alias du catalogue de versions
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
-    // Import the Compose BOM
-    implementation(platform(libs.androidx.compose.bom)) // You already have this
+    // Import du BOM Compose - C'est la meilleure pratique
+    implementation(platform(libs.androidx.compose.bom))
+
+    // Dépendances Compose SANS version (le BOM s'en occupe)
     implementation("androidx.compose.runtime:runtime")
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3") // La version sera gérée par le BOM
+    implementation("androidx.compose.material:material") // Pour BottomNavigation M2
+    implementation("androidx.compose.animation:animation")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.runtime:runtime-livedata")
 
-    // Import the Firebase BOM
+
+    // Import du BOM Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth) // Use the alias without -ktx
+    implementation(libs.firebase.auth)
     implementation(libs.firebase.analytics)
 
-    // Google Sign-In and Credentials
-    implementation(libs.play.services.auth) // This provides GoogleSignIn
+    // Dépendances Google Sign-In & Credentials
+    implementation(libs.play.services.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
 
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.animation:animation")
-    implementation("androidx.compose.material:material-icons-extended")
-
-    implementation("androidx.navigation:navigation-compose:2.8.3")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-compose:1.9.2")
-
-    implementation("androidx.compose.runtime:runtime-livedata")
-
-    // Testing dependencies
+    // Dépendances de Test (inchangées)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
