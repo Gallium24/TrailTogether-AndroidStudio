@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.trailtogether_v01.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
 import com.example.trailtogether_v01.ui.components.DifficultyFilterChips
@@ -23,6 +30,9 @@ import com.example.trailtogether_v01.ui.components.TrailCard
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToTrailDetail: (String) -> Unit,
@@ -45,11 +55,10 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Trail Together",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = TrailGreen
+            Image(
+                painter = painterResource(id = R.drawable.trailtogether_logo),
+                contentDescription = "Logo TrailTogether",
+                modifier = Modifier.height(30.dp) // Ajustez la hauteur selon vos préférences
             )
             IconButton(onClick = { }) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
