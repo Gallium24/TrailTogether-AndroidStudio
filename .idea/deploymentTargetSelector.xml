@@ -3,11 +3,11 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="app">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-11-11T02:44:49.687273400Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-11-11T19:46:39.190584900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RZCX409FQYT" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Utilisateur.LAPTOP-MU1TL9RA\.android\avd\Pixel_9.avd" />
             </handle>
           </Target>
         </DropdownSelection>

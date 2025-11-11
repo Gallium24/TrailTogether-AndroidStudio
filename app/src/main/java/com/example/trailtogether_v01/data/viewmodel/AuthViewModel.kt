@@ -31,15 +31,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     init {
-        // Configuration du client Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(application.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(application, gso)
 
-        // Observer l'état de l'authentification Firebase au démarrage
-        auth.currentUser?.let { firebaseUser ->
+        // Vérifie l'état d'authentification au démarrage
+        val firebaseUser = auth.currentUser
+        if (firebaseUser != null) {
             _currentUser.value = User(
                 id = firebaseUser.uid,
                 name = firebaseUser.displayName ?: "Utilisateur",
@@ -47,6 +47,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 email = firebaseUser.email ?: ""
             )
             _authState.value = AuthState.Success(_currentUser.value!!)
+        } else {
+            // <<< C’est cette ligne qui manquait >>>
+            _authState.value = AuthState.Error("Aucun utilisateur connecté")
         }
     }
 
