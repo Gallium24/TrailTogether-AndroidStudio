@@ -32,7 +32,6 @@ fun MainScreen(
             navController = mainNavController,
             startDestination = Screen.Home.route,
             modifier = Modifier
-                .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.systemBars)
         ) {
             composable(Screen.Home.route) {

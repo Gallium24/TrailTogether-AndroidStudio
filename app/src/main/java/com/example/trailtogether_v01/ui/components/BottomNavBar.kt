@@ -65,7 +65,7 @@ fun BottomNavBar(navController: NavController) {
                                     .background(
                                         TrailGreen,
                                         shape = CircleShape
-                                    ), // Le carré devient un cercle parfait
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
