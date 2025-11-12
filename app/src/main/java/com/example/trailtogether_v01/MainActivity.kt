@@ -18,11 +18,7 @@ import com.example.trailtogether_v01.data.viewmodel.AuthViewModel
 import com.example.trailtogether_v01.navigation.NavGraph
 import com.example.trailtogether_v01.ui.screens.main.MainScreen
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
-
-import androidx.lifecycle.lifecycleScope  // Pour launchWhenStarted
-import com.example.trailtogether_v01.data.repository.FirestoreRepository
-import kotlinx.coroutines.launch
-
+import com.example.trailtogether_v01.utils.OsmdroidInitializer
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
@@ -35,6 +31,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             authViewModel.authState.value is AuthState.Idle
         }
+
+        OsmdroidInitializer.init(this)
 
         /*
         val repository = FirestoreRepository()  // Instance du repo

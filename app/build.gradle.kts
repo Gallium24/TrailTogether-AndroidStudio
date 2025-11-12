@@ -71,6 +71,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.runtime:runtime-livedata")
 
+    // Import osmdroid pour map interactive
+
+    implementation("org.osmdroid:osmdroid-wms:6.1.18")
 
     // Import du BOM Firebase
     implementation(platform(libs.firebase.bom))
