@@ -1,19 +1,30 @@
 package com.example.trailtogether_v01.navigation
 
 sealed class Screen(val route: String) {
-    object Login : Screen("login")
-    object Register : Screen("register")
-    object Home : Screen("home")
-    object TrailDetail : Screen("trail_detail/{trailId}") {
-        fun createRoute(trailId: String) = "trail_detail/$trailId"
+    // Écrans d'authentification
+    object Login : Screen("login_screen")
+    object Register : Screen("register_screen")
+
+    // Écran principal qui contient la barre de navigation
+    // (Cette route n'est plus utilisée directement si MainActivity fait l'aiguillage, mais on la garde par propreté)
+    object Main : Screen("main_screen")
+
+    // Écrans accessibles depuis la barre de navigation
+    object Home : Screen("home_screen")
+    object Feed : Screen("feed_screen")
+    object Profile : Screen("profile_screen")
+    object Calendar : Screen("calendar_screen")
+
+    // Écrans accessibles depuis l'onglet Home
+    object TrailDetail : Screen("trail_detail_screen/{trailId}") {
+        fun createRoute(trailId: String) = "trail_detail_screen/$trailId"
     }
-    object Feed : Screen("feed")
-    object CreatePost : Screen("create_post")
-    object Calendar : Screen("calendar")
-    object EventDetail : Screen("event_detail/{eventId}") {
-        fun createRoute(eventId: String) = "event_detail/$eventId"
-    }
-    object Profile : Screen("profile")
-    object EditProfile : Screen("edit_profile")
-    object EmergencyContact : Screen("emergency_contact")
+
+    // Écrans accessibles depuis l'onglet Feed
+    object CreatePost : Screen("create_post_screen")
+
+
+    // Écrans accessibles via l'onglet Profile
+    object EditProfile : Screen("edit_profile_screen")
+    object EmergencyContact : Screen("emergency_contact_screen")
 }

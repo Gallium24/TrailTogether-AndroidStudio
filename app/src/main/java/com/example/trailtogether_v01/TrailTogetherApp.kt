@@ -31,12 +31,16 @@ fun TrailTogetherApp(
                         Screen.Profile.route,
                         Screen.Calendar.route
                     )) {
-                    BottomNavBar(navController = navController)
+                    BottomNavBar(
+                        navController = navController,
+                        content = TODO()
+                    )
                 }
             }
         }
     ) { paddingValues ->
         NavGraph(
+            
             navController = navController,
             authViewModel = authViewModel
         )
