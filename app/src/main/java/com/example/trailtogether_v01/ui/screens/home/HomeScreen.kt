@@ -38,7 +38,7 @@ fun HomeScreen(
     onNavigateToTrailDetail: (String) -> Unit,
     homeViewModel: HomeViewModel = viewModel()
 ) {
-    val filteredTrails = homeViewModel.getFilteredTrails()
+    val filteredTrails by homeViewModel.filteredTrails.collectAsState()
     val selectedDifficulty by homeViewModel.selectedDifficulty.collectAsState()
     val searchQuery by homeViewModel.searchQuery.collectAsState()
 

@@ -142,7 +142,7 @@ class FirestoreRepository {
         }.await()
         // Note: Pour une app multi-users, mieux avoir une subcollection "likes" par post pour tracker par user et éviter race conditions.
     }
-
+    /*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(
             Trail(
@@ -215,4 +215,6 @@ class FirestoreRepository {
             firestore.collection("posts").document(post.id).set(post).await()
         }
     }
+
+     */
 }

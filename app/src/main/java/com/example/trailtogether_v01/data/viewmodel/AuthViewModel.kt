@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore // Ajouté
 import com.google.firebase.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.tasks.await
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth: FirebaseAuth = Firebase.auth
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance() // Ajouté
     private val googleSignInClient: GoogleSignInClient
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -37,25 +39,24 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             .build()
         googleSignInClient = GoogleSignIn.getClient(application, gso)
 
-        // Vérifie l'état d'authentification au démarrage
-        val firebaseUser = auth.currentUser
-        if (firebaseUser != null) {
-            _currentUser.value = User(
-                id = firebaseUser.uid,
-                name = firebaseUser.displayName ?: "Utilisateur",
-                username = firebaseUser.displayName ?: "Utilisateur",
-                email = firebaseUser.email ?: ""
-            )
-            _authState.value = AuthState.Success(_currentUser.value!!)
-        } else {
-            // <<< C’est cette ligne qui manquait >>>
-            _authState.value = AuthState.Error("Aucun utilisateur connecté")
+        viewModelScope.launch {
+            val firebaseUser = auth.currentUser
+            if (firebaseUser != null) {
+                // Fetch from Firestore
+                val userDoc = firestore.collection("users").document(firebaseUser.uid).get().await()
+                val user = userDoc.toObject(User::class.java)
+                if (user != null) {
+                    _currentUser.value = user
+                    _authState.value = AuthState.Success(user)
+                } else {
+                    _authState.value = AuthState.Error("Utilisateur non trouvé dans la base de données")
+                }
+            } else {
+                _authState.value = AuthState.Error("Aucun utilisateur connecté")
+            }
         }
     }
 
-    // --- NOUVELLES FONCTIONS D'AUTHENTIFICATION ---
-
-    // Connexion avec Email et Mot de passe
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
             _authState.value = AuthState.Error("Email et mot de passe requis.")
@@ -67,14 +68,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val authResult = auth.signInWithEmailAndPassword(email, password).await()
                 val firebaseUser = authResult.user
                 if (firebaseUser != null) {
-                    val user = User(
-                        id = firebaseUser.uid,
-                        name = firebaseUser.displayName ?: "Utilisateur",
-                        username = firebaseUser.displayName ?: "Utilisateur",
-                        email = firebaseUser.email!!
-                    )
-                    _currentUser.value = user
-                    _authState.value = AuthState.Success(user)
+                    val userDoc = firestore.collection("users").document(firebaseUser.uid).get().await()
+                    val user = userDoc.toObject(User::class.java)
+                    if (user != null) {
+                        _currentUser.value = user
+                        _authState.value = AuthState.Success(user)
+                    } else {
+                        _authState.value = AuthState.Error("Utilisateur non trouvé")
+                    }
                 }
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.message ?: "Échec de la connexion")
@@ -82,7 +83,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Inscription avec Email et Mot de passe
     fun register(name: String, email: String, password: String) {
         if (name.isBlank() || email.isBlank() || password.isBlank()) {
             _authState.value = AuthState.Error("Tous les champs sont requis.")
@@ -91,37 +91,32 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             try {
-                // Étape 1: Créer l'utilisateur
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-                val firebaseUser = authResult.user!! // Non-null si succès
-
-                // Note : Vous pourriez ajouter la mise à jour du nom d'affichage (displayName) ici
-                // et stocker l'utilisateur dans Firestore/Realtime Database si nécessaire.
-
+                val firebaseUser = authResult.user!!
                 val user = User(
                     id = firebaseUser.uid,
                     name = name,
-                    username = name, // Utilise le nom fourni
-                    email = firebaseUser.email!!
+                    username = name, // Ou générer un username unique
+                    email = firebaseUser.email!!,
+                    followersCount = 0,
+                    followingCount = 0,
+                    trailsCount = 0
                 )
+                firestore.collection("users").document(firebaseUser.uid).set(user).await()
                 _currentUser.value = user
                 _authState.value = AuthState.Success(user)
-
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.message ?: "Échec de l'inscription")
             }
         }
     }
 
-    // Déconnexion
     fun logout() {
         auth.signOut()
-        googleSignInClient.signOut() // Important pour Google
+        googleSignInClient.signOut()
         _currentUser.value = null
         _authState.value = AuthState.Idle
     }
-
-    // --- LOGIQUE POUR GOOGLE SIGN-IN ---
 
     fun getGoogleSignInIntent(): Intent {
         return googleSignInClient.signInIntent
@@ -137,12 +132,24 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 val authResult = auth.signInWithCredential(credential).await()
                 val firebaseUser = authResult.user!!
-                val user = User(
-                    id = firebaseUser.uid,
-                    name = firebaseUser.displayName ?: "Utilisateur Google",
-                    username = firebaseUser.displayName ?: "Utilisateur Google",
-                    email = firebaseUser.email!!
-                )
+                // Vérifier si l'utilisateur existe déjà dans Firestore
+                val userDoc = firestore.collection("users").document(firebaseUser.uid).get().await()
+                val user = if (userDoc.exists()) {
+                    userDoc.toObject(User::class.java)!!
+                } else {
+                    // Créer un nouveau
+                    User(
+                        id = firebaseUser.uid,
+                        name = firebaseUser.displayName ?: "Utilisateur Google",
+                        username = firebaseUser.displayName ?: "Utilisateur Google",
+                        email = firebaseUser.email!!,
+                        followersCount = 0,
+                        followingCount = 0,
+                        trailsCount = 0
+                    ).also {
+                        firestore.collection("users").document(firebaseUser.uid).set(it).await()
+                    }
+                }
                 _currentUser.value = user
                 _authState.value = AuthState.Success(user)
             } catch (e: Exception) {

@@ -3,14 +3,14 @@ package com.example.trailtogether_v01.data.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trailtogether_v01.data.models.Post
-import com.example.trailtogether_v01.data.repository.MockRepository
+import com.example.trailtogether_v01.data.repository.FirestoreRepository // Changé de MockRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FeedViewModel : ViewModel() {
-    private val repository = MockRepository()
+    private val repository = FirestoreRepository()
 
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts.asStateFlow()
@@ -33,20 +33,17 @@ class FeedViewModel : ViewModel() {
     }
 
     fun likePost(postId: String) {
-        _posts.value = _posts.value.map { post ->
-            if (post.id == postId) {
-                post.copy(
-                    isLiked = !post.isLiked,
-                    likesCount = if (post.isLiked) post.likesCount - 1 else post.likesCount + 1
-                )
-            } else post
+        viewModelScope.launch {
+            val currentPost = _posts.value.find { it.id == postId } ?: return@launch
+            repository.toggleLikePost(postId, currentPost.isLiked)
+            // Le snapshot listener mettra à jour _posts automatiquement
         }
     }
 
     fun createPost(trailId: String, content: String) {
         viewModelScope.launch {
             repository.createPost(trailId, content)
-            loadPosts()
+            // Pas besoin de reload, snapshot listener mettra à jour
         }
     }
 }

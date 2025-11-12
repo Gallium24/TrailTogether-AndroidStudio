@@ -4,6 +4,8 @@ import com.example.trailtogether_v01.data.models.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import com.google.firebase.Timestamp
+
 
 class MockRepository {
 
@@ -78,7 +80,7 @@ class MockRepository {
             content = content,
             likesCount = 0,
             commentsCount = 0,
-            timestamp = "À l'instant"
+            timestamp = Timestamp.now()
         )
         return Result.success(post)
     }
@@ -218,7 +220,7 @@ class MockRepository {
             content = "Magnifique randonnée ce matin ! Les paysages étaient à couper le souffle 🏔️",
             likesCount = 21,
             commentsCount = 4,
-            timestamp = "il y a 3 heures",
+            timestamp = Timestamp.now(),
             isLiked = false
         ),
         Post(
@@ -231,7 +233,7 @@ class MockRepository {
             content = "Une journée incroyable au Mont Blanc ! Conditions parfaites 🌞",
             likesCount = 45,
             commentsCount = 8,
-            timestamp = "il y a 1 jour",
+            timestamp = Timestamp.now(),
             isLiked = true
         ),
         Post(
@@ -244,7 +246,7 @@ class MockRepository {
             content = "Balade familiale autour du lac, parfait pour un dimanche ! 🚶‍♀️",
             likesCount = 67,
             commentsCount = 12,
-            timestamp = "il y a 2 jours",
+            timestamp = Timestamp.now(),
             isLiked = false
         )
     )

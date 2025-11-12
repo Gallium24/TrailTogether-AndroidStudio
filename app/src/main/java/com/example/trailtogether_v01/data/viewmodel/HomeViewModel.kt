@@ -4,14 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trailtogether_v01.data.models.Difficulty
 import com.example.trailtogether_v01.data.models.Trail
-import com.example.trailtogether_v01.data.repository.MockRepository
+import com.example.trailtogether_v01.data.repository.FirestoreRepository // Changé
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
-    private val repository = MockRepository()
+    private val repository = FirestoreRepository()
 
     private val _trails = MutableStateFlow<List<Trail>>(emptyList())
     val trails: StateFlow<List<Trail>> = _trails.asStateFlow()
@@ -22,17 +23,37 @@ class HomeViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    private val _filteredTrails = MutableStateFlow<List<Trail>>(emptyList())
+    val filteredTrails: StateFlow<List<Trail>> = _filteredTrails.asStateFlow()
+
     init {
         loadTrails()
     }
 
     private fun loadTrails() {
         viewModelScope.launch {
-            repository.getTrails().collect { trailList ->
-                _trails.value = trailList
+            // Collecte les trails en continu
+            launch {
+                repository.getTrails().collect { trailList ->
+                    _trails.value = trailList
+                }
             }
+
+            // Combine les filtres et met à jour la liste affichée
+            combine(_trails, _selectedDifficulty, _searchQuery) { trails, diff, query ->
+                var filtered = trails
+                diff?.let { filtered = filtered.filter { it.difficulty == diff } }
+                if (query.isNotEmpty()) {
+                    filtered = filtered.filter {
+                        it.name.contains(query, ignoreCase = true) ||
+                                it.location.contains(query, ignoreCase = true)
+                    }
+                }
+                filtered
+            }.collect { _filteredTrails.value = it }
         }
     }
+
 
     fun setDifficultyFilter(difficulty: Difficulty?) {
         _selectedDifficulty.value = difficulty
@@ -42,20 +63,4 @@ class HomeViewModel : ViewModel() {
         _searchQuery.value = query
     }
 
-    fun getFilteredTrails(): List<Trail> {
-        var filtered = _trails.value
-
-        _selectedDifficulty.value?.let { diff ->
-            filtered = filtered.filter { it.difficulty == diff }
-        }
-
-        if (_searchQuery.value.isNotEmpty()) {
-            filtered = filtered.filter {
-                it.name.contains(_searchQuery.value, ignoreCase = true) ||
-                        it.location.contains(_searchQuery.value, ignoreCase = true)
-            }
-        }
-
-        return filtered
-    }
 }

@@ -55,7 +55,7 @@ fun PostCard(
                         fontSize = 14.sp
                     )
                     Text(
-                        text = post.timestamp,
+                        text = android.text.format.DateFormat.format("dd MMM yyyy HH:mm", post.timestamp.toDate()).toString(),
                         fontSize = 12.sp,
                         color = Color.Gray
                     )

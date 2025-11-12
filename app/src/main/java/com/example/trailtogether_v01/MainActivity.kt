@@ -19,6 +19,9 @@ import com.example.trailtogether_v01.navigation.NavGraph
 import com.example.trailtogether_v01.ui.screens.main.MainScreen
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 
+import androidx.lifecycle.lifecycleScope  // Pour launchWhenStarted
+import com.example.trailtogether_v01.data.repository.FirestoreRepository
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -32,6 +35,15 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             authViewModel.authState.value is AuthState.Idle
         }
+
+        /*
+        val repository = FirestoreRepository()  // Instance du repo
+        // Insertion des mocks (commente après le premier lancement !)
+        lifecycleScope.launch {
+            repository.insertMockTrails()
+            repository.insertMockPosts()
+        }*/
+
 
         setContent {
             TrailTogetherTheme {
