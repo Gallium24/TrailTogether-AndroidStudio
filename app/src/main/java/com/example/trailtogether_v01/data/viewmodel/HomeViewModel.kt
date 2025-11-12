@@ -63,4 +63,10 @@ class HomeViewModel : ViewModel() {
         _searchQuery.value = query
     }
 
+    fun getTrailById(trailId: String): Trail? {
+        // Cette fonction recherche dans la liste complète des randonnées
+        // et retourne celle qui correspond à l'ID, ou null si non trouvée.
+        return _trails.value.find { it.id == trailId }
+    }
+
 }

@@ -103,7 +103,7 @@ class MockRepository {
         Trail(
             id = "trail_1",
             name = "Randonnée des Sapins",
-            location = "Chamonix, France",
+            location = "Saguenay, Québec",
             distance = 12.5,
             duration = "4h 30min",
             difficulty = Difficulty.MODERATE,
@@ -117,7 +117,7 @@ class MockRepository {
         Trail(
             id = "trail_2",
             name = "Randonnée des Pins",
-            location = "Annecy, France",
+            location = "Chicoutimi, Québec",
             distance = 30.2,
             duration = "8h 15min",
             difficulty = Difficulty.HARD,
@@ -130,8 +130,8 @@ class MockRepository {
         ),
         Trail(
             id = "trail_3",
-            name = "Sentier du Mont Blanc",
-            location = "Mont Blanc, France",
+            name = "Sentier du ruisseau",
+            location = "Chicoutimi, Québec",
             distance = 18.5,
             duration = "6h 00min",
             difficulty = Difficulty.EXPERT,
@@ -145,7 +145,7 @@ class MockRepository {
         Trail(
             id = "trail_4",
             name = "Balade du Lac",
-            location = "Annecy, France",
+            location = "Montréal, Québec",
             distance = 5.2,
             duration = "2h 00min",
             difficulty = Difficulty.EASY,

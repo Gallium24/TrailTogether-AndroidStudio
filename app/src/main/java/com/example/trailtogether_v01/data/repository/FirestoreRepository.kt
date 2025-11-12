@@ -142,28 +142,27 @@ class FirestoreRepository {
         }.await()
         // Note: Pour une app multi-users, mieux avoir une subcollection "likes" par post pour tracker par user et éviter race conditions.
     }
-    /*
+/*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(
             Trail(
-                id = "trail_1",
-                name = "Randonnée des Sapins",
-                location = "Chamonix, France",
-                distance = 12.5,
-                duration = "4h 30min",
-                difficulty = Difficulty.MODERATE,
-                rating = 4.5f,
-                reviewsCount = 234,
-                description = "Magnifique sentier à travers la forêt de sapins avec vue panoramique.",
-                latitude = 45.9237,
-                longitude = 6.8694,
-                tags = listOf("Forêt", "Vue panoramique", "Famille")
+            id = "trail_1",
+            name = "Randonnée des Sapins",
+            location = "Saguenay, Québec",
+            distance = 12.5,
+            duration = "4h 30min",
+            difficulty = Difficulty.MODERATE,
+            rating = 4.5f,
+            reviewsCount = 234,
+            description = "Magnifique sentier à travers la forêt de sapins avec vue panoramique.",
+            latitude = 45.9237,
+            longitude = 6.8694,
+            tags = listOf("Forêt", "Vue panoramique", "Famille")
             ),
-            // Ajoute les autres trails de ton MockRepository
             Trail(
                 id = "trail_2",
                 name = "Randonnée des Pins",
-                location = "Annecy, France",
+                location = "Chicoutimi, Québec",
                 distance = 30.2,
                 duration = "8h 15min",
                 difficulty = Difficulty.HARD,
@@ -173,8 +172,35 @@ class FirestoreRepository {
                 latitude = 45.8992,
                 longitude = 6.1294,
                 tags = listOf("Technique", "Vue", "Expérimenté")
+            ),
+            Trail(
+                id = "trail_3",
+                name = "Sentier du ruisseau",
+                location = "Chicoutimi, Québec",
+                distance = 18.5,
+                duration = "6h 00min",
+                difficulty = Difficulty.EXPERT,
+                rating = 4.9f,
+                reviewsCount = 89,
+                description = "Ascension mythique réservée aux randonneurs expérimentés.",
+                latitude = 45.8326,
+                longitude = 6.8652,
+                tags = listOf("Haute montagne", "Glacier", "Expert")
+            ),
+            Trail(
+                id = "trail_4",
+                name = "Balade du Lac",
+                location = "Montréal, Québec",
+                distance = 5.2,
+                duration = "2h 00min",
+                difficulty = Difficulty.EASY,
+                rating = 4.2f,
+                reviewsCount = 456,
+                description = "Promenade facile en bord de lac, idéale pour les familles.",
+                latitude = 45.9000,
+                longitude = 6.1167,
+                tags = listOf("Lac", "Facile", "Famille")
             )
-            // Etc.
         )
         mockTrails.forEach { trail ->
             firestore.collection("trails").document(trail.id).set(trail).await()
