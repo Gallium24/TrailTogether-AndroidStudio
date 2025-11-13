@@ -16,7 +16,6 @@ import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
 import com.example.trailtogether_v01.ui.screens.home.HomeScreen
 import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
-import com.example.trailtogether_v01.ui.screens.profile.EmergencyContactScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 
 @Composable
@@ -57,20 +56,12 @@ fun MainScreen(onLogout: () -> Unit) {
                     onNavigateToEditProfile = {
                         navController.navigate(Screen.EditProfile.route)
                     },
-                    onNavigateToEmergencyContact = {
-                        navController.navigate(Screen.EmergencyContact.route)
-                    }
                 )
             }
 
             // --- Écrans additionnels ---
             composable(Screen.EditProfile.route) {
                 EditProfileScreen(
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.EmergencyContact.route) {
-                EmergencyContactScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

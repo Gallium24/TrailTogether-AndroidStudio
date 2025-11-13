@@ -15,33 +15,31 @@ class ProfileViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     init {
+        loadCurrentUser()
+    }
+
+    private fun loadCurrentUser() {
         viewModelScope.launch {
-            repository.getCurrentUser().collect {
-                _user.value = it
+            _isLoading.value = true
+            repository.getCurrentUser().collect { currentUser ->
+                _user.value = currentUser
+                _isLoading.value = false
             }
         }
     }
 
-    fun updateEmergencyContact(name: String, phone: String) {
-        viewModelScope.launch {
-            _user.value?.let { current ->
-                val updated = current.copy(
-                    emergencyContact = name,
-                    emergencyPhone = phone
-                )
-                repository.updateUser(updated)
-                // Snapshot mettra à jour _user
-            }
-        }
-    }
-
-    fun updateProfile(name: String, bio: String) {
+    fun updateUserProfile(name: String, bio: String,emergencyContact: String, emergencyPhone: String) {
         viewModelScope.launch {
             _user.value?.let { current ->
                 val updated = current.copy(
                     name = name,
-                    bio = bio
+                    bio = bio,
+                    emergencyContact = emergencyContact,
+                    emergencyPhone = emergencyPhone
                 )
                 repository.updateUser(updated)
             }

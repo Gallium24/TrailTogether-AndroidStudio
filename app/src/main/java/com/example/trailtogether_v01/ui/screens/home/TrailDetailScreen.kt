@@ -116,7 +116,7 @@ fun TrailDetailScreen(
                         Text(text = t.location, fontSize = 16.sp, color = Color.Gray)
                     }
 
-                    // Stats (le reste du code est identique)
+                    // Stats
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly

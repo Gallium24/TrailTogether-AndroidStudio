@@ -27,7 +27,6 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
-    onNavigateToEmergencyContact: () -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
     val user by profileViewModel.user.collectAsState()
@@ -126,20 +125,6 @@ fun ProfileScreen(
             Icon(Icons.Default.Edit, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text("Modifier le profil")
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedButton(
-            onClick = onNavigateToEmergencyContact,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(Icons.Default.Phone, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Contact d'urgence")
         }
 
         Spacer(modifier = Modifier.height(12.dp))

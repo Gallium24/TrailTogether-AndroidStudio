@@ -26,5 +26,5 @@ sealed class Screen(val route: String) {
 
     // Écrans accessibles via l'onglet Profile
     object EditProfile : Screen("edit_profile_screen")
-    object EmergencyContact : Screen("emergency_contact_screen")
+
 }
