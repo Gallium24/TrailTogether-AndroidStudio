@@ -15,16 +15,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.data.viewmodel.AuthViewModel
-import com.example.trailtogether_v01.navigation.NavGraph
-import com.example.trailtogether_v01.ui.screens.main.MainScreen
+import com.example.trailtogether_v01.navigation.AuthNavGraph
+import com.example.trailtogether_v01.navigation.RootNavGraph
+
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 import com.example.trailtogether_v01.utils.OsmdroidInitializer
 /**
  * MainActivity est le point d'entrée unique de l'application.
- * Son rôle est de déterminer l'état d'authentification de l'utilisateur (connecté ou non)
- * et d'afficher le graphe de navigation approprié :
- * - Si l'utilisateur n'est pas connecté, affiche le NavGraph d'authentification (Login/Register).
- * - Si l'utilisateur est connecté, affiche le MainScreen qui contient la navigation principale de l'application.
+ * Elle gère l'état de l'authentification et la navigation entre les écrans.
  */
 
 class MainActivity : ComponentActivity() {
@@ -59,19 +57,11 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val authState by authViewModel.authState.collectAsState()
                     val navController = rememberNavController()
-
-                    // --- LOGIQUE CENTRALE ---
-                    // Affiche le bon écran en fonction de l'état de connexion
-                    if (authState is AuthState.Success) {
-                        // Utilisateur connecté : on affiche l'écran principal avec la barre de navigation
-                        MainScreen(onLogout = { authViewModel.logout() })
-                    } else {
-                        // Utilisateur non connecté : on affiche le graphe de navigation pour l'authentification
-                        NavGraph(
-                            navController = navController,
-                            authViewModel = authViewModel
-                        )
-                    }
+                    RootNavGraph(
+                        authViewModel = authViewModel,
+                        authState = authState,
+                        navController = navController
+                    )
                 }
             }
         }

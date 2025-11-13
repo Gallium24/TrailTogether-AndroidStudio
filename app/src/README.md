@@ -35,7 +35,6 @@ L'application suit une architecture MVVM (Model-View-ViewModel), séparant clair
       -   `User.kt`: Définit la structure des données d'un utilisateur (nom, bio, contact d'urgence).
 -   **`repository/`**
     -   `FirestoreRepository.kt`: **Le Cœur de la couche de données**. Centralise toutes les requêtes vers la base de données Firestore (récupérer les sentiers, les posts, mettre à jour un profil, gérer les likes). Il cache la complexité de Firebase aux ViewModels.
-    -   `MockRepository.kt`: Pour les tests.
 -   **`viewmodel/`**
   -   `AuthState.kt`: Définit l'état d'authentification de l'utilisateur pour être utilisé dans AuthViewModel.kt.
   -   `AuthViewModel.kt`: Gère la logique d'authentification : inscription, connexion (email/mot de passe et Google), et déconnexion.
@@ -46,7 +45,9 @@ L'application suit une architecture MVVM (Model-View-ViewModel), séparant clair
 
 #### `navigation/` : Gestion de la navigation
 
--   `NavGraph.kt`: Définit le graphe de navigation pour la partie **authentification** de l'application (les écrans `LoginScreen` et `RegisterScreen`).
+-   `AuthNavGraph.kt`: Définit le graphe de navigation pour la partie **authentification** de l'application (les écrans `LoginScreen` et `RegisterScreen`).
+-   `MainNavGraph.kt`: Définit le graphe de navigation interne de l'application
+-   `RootNavGraph.kt`: Définit le graphe de navigation racine de l'application. Il détermine quel graphe de navigation afficher en fonction de l'état d'authentification de l'utilisateur.
 -   `Screen.kt`: Contient un `sealed class` qui définit toutes les routes (chemins de navigation) de l'application de manière centralisée et sécurisée.
 
 #### `ui/` : Couche de présentation (UI)
@@ -72,8 +73,6 @@ L'application suit une architecture MVVM (Model-View-ViewModel), séparant clair
    -   **`home/`**:
        -   `HomeScreen.kt`: Écran principal après connexion. Affiche la carte interactive et la liste filtrable des sentiers.
        -   `TrailDetailScreen.kt`: Affiche les détails complets d'un sentier sélectionné.
-   -   **`main/`**:
-       -   `MainScreen.kt`: **Chef d'orchestre post-connexion**. Contient le `Scaffold` (structure avec la barre de navigation) et le `NavHost` pour la navigation entre Home, Feed, Calendar et Profile. 
    - **`profile/`**:
        -   `ProfileScreen.kt`: Affiche les informations du profil de l'utilisateur.
        -   `EditProfileScreen.kt`: Formulaire pour modifier les informations du profil.
@@ -83,8 +82,7 @@ L'application suit une architecture MVVM (Model-View-ViewModel), séparant clair
     -   `Color.kt`: Contient les couleurs utilisées dans l'application.
     -   `Type.kt`: Contient les styles de typographie.
 
--   `MainActivity.kt`: **Le Point d'Entrée**. Décide quel graphe de navigation afficher : celui d'authentification (`NavGraph`) si l'utilisateur n'est pas connecté, ou l'écran principal (`MainScreen`) s'il l'est.
--   `TrailTogetherApp.kt`: Initialise l'application.
+-   `MainActivity.kt`: Point d'entrée principal de l'application.
 
 ---
 

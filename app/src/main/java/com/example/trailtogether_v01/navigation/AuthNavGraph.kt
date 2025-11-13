@@ -13,8 +13,12 @@ import com.example.trailtogether_v01.data.viewmodel.AuthViewModel
 import com.example.trailtogether_v01.ui.screens.auth.LoginScreen
 import com.example.trailtogether_v01.ui.screens.auth.RegisterScreen
 
+/**
+ * AuthNavGraph est le graphe de navigation interne de l'authentification.
+ * Il contient les écrans de login et register.
+ */
 @Composable
-fun NavGraph(
+fun AuthNavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel = viewModel()
 ) {

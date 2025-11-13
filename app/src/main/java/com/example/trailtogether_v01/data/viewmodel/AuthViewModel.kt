@@ -21,6 +21,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 /**
+ * Représente les différents états possibles de l'authentification.
+ */
+sealed class AuthState {
+    object Idle : AuthState()
+    object Loading : AuthState()
+    data class Success(val user: User) : AuthState()
+    data class Error(val message: String) : AuthState()
+}
+
+/**
  * AuthViewModel gère toute la logique liée à l'authentification des utilisateurs.
  * Il expose l'état d'authentification (AuthState) et fournit des méthodes pour :
  * - Se connecter avec email/mot de passe.
