@@ -1,8 +1,12 @@
 package com.example.trailtogether_v01.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -20,20 +24,26 @@ fun DifficultyFilterChips(
     selectedDifficulty: Difficulty?,
     onDifficultySelected: (Difficulty?) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
     ) {
-        FilterChip(
-            selected = selectedDifficulty == null,
-            onClick = { onDifficultySelected(null) },
-            label = { Text("Tous") },
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = TrailGreen,
-                selectedLabelColor = Color.White
+
+        item {
+            FilterChip(
+                selected = selectedDifficulty == null,
+                onClick = { onDifficultySelected(null) },
+                label = { Text("Tous") },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = TrailGreen,
+                    selectedLabelColor = Color.White
+                )
             )
-        )
-        Difficulty.values().forEach { difficulty ->
+        }
+
+        items(Difficulty.entries) { difficulty ->
             FilterChip(
                 selected = selectedDifficulty == difficulty,
                 onClick = { onDifficultySelected(difficulty) },
