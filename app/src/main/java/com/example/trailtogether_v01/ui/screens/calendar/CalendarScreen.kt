@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trailtogether_v01.data.repository.MockRepository
+import com.example.trailtogether_v01.data.repository.FirestoreRepository
 import com.example.trailtogether_v01.ui.components.EventCard
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 
@@ -33,7 +33,8 @@ import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 fun CalendarScreen(
     onNavigateToEventDetail: (String) -> Unit
 ) {
-    val repository = MockRepository()
+    val repository = FirestoreRepository()
+
     var selectedDate by remember { mutableStateOf(15) }
     var selectedMonth by remember { mutableStateOf("Janvier") }
 
