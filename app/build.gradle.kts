@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.compose.animation.graphics)
 
     // Dépendances de Test (inchangées)
     testImplementation(libs.junit)
