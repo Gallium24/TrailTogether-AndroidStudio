@@ -29,6 +29,7 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 fun TrailDetailScreen(
     trailId: String,
     onNavigateBack: () -> Unit,
+    onPlanEventClick: () -> Unit,
     detailViewModel: TrailDetailViewModel = viewModel()
 ) {
     LaunchedEffect(key1 = trailId) {
@@ -163,7 +164,7 @@ fun TrailDetailScreen(
                         }
                     }
                     Button(
-                        onClick = { },
+                        onClick = onPlanEventClick,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = TrailGreen)
                     ) {

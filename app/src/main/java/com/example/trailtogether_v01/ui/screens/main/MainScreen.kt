@@ -3,9 +3,11 @@ package com.example.trailtogether_v01.ui.screens.main
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.ui.components.BottomNavBar
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
@@ -31,8 +33,8 @@ fun MainScreen(onLogout: () -> Unit) {
         ) {
             // --- Écrans principaux ---
             composable(Screen.Home.route) {
-                HomeScreen(onNavigateToTrailDetail = {
-                    navController.navigate(Screen.TrailDetail.createRoute(it))
+                HomeScreen(onNavigateToTrailDetail = { trailId ->
+                    navController.navigate("trail_detail_screen/$trailId")
                 })
             }
             composable(Screen.Feed.route) {
@@ -77,14 +79,27 @@ fun MainScreen(onLogout: () -> Unit) {
                     onNavigateBack = { navController.popBackStack() }
                 )
             }
-            composable(Screen.TrailDetail.route) { backStackEntry ->
-                val trailId = backStackEntry.arguments?.getString("trailId")
-                if (trailId != null) {
-                    TrailDetailScreen(
-                        trailId = trailId,
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
+            composable(
+                route = "trail_detail_screen/{trailId}",
+                arguments = listOf(navArgument("trailId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val trailId = backStackEntry.arguments?.getString("trailId") ?: return@composable
+                TrailDetailScreen(
+                    trailId = trailId,
+                    onNavigateBack = { navController.popBackStack() },
+                    // --- LOGIQUE POUR ALLER AU CALENDRIER ---
+                    onPlanEventClick = {
+                        // On navigue vers la route du Calendrier
+                        navController.navigate(Screen.Calendar.route) {
+                            // On nettoie la pile pour éviter les retours étranges
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
         }
     }
