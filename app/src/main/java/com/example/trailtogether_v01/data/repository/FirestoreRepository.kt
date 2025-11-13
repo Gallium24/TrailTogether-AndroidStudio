@@ -1,6 +1,9 @@
 package com.example.trailtogether_v01.data.repository
 
+import android.util.Log
+import androidx.compose.animation.core.copy
 import com.example.trailtogether_v01.data.models.*
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
@@ -11,13 +14,16 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 
 
 class FirestoreRepository {
 
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
+    private val db = Firebase.firestore
     // Note: Les méthodes login/register ne sont pas utilisées dans AuthViewModel car l'auth est gérée directement là-bas.
     // Mais si besoin, on peut les implémenter avec Firestore pour stocker l'utilisateur après création.
 
@@ -101,14 +107,32 @@ class FirestoreRepository {
 
     // Posts
     fun getPosts(): Flow<List<Post>> = callbackFlow {
+        val currentUserId = auth.currentUser?.uid ?: run {
+            trySend(emptyList()) // Envoyer une liste vide si pas d'utilisateur
+            close()
+            return@callbackFlow
+        }
         val listener = firestore.collection("posts")
-            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING) // Assumant que timestamp est un champ Timestamp ou String sortable
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
                     return@addSnapshotListener
                 }
-                val posts = snapshot?.documents?.mapNotNull { it.toObject<Post>(Post::class.java) } ?: emptyList()
+                if (snapshot == null) return@addSnapshotListener
+
+                // --- CORRECTION PRINCIPALE ICI ---
+                val posts = snapshot.documents.mapNotNull { doc ->
+                    // 1. On convertit le document en objet Post
+                    doc.toObject<Post>()?.let { post ->
+                        // 2. On met à jour l'objet avec le VRAI ID du document
+                        //    et on calcule si l'utilisateur actuel a liké le post.
+                        post.copy(
+                            id = doc.id,
+                            isLiked = (doc["likedBy"] as? List<*>)?.contains(currentUserId) ?: false
+                        )
+                    }
+                }
                 trySend(posts)
             }
         awaitClose { listener.remove() }
@@ -133,14 +157,43 @@ class FirestoreRepository {
     }
 
     // Ajoute une méthode pour like/unlike post (puisque likePost dans ViewModel est local, mais pour persistance)
-    suspend fun toggleLikePost(postId: String, isLiked: Boolean) {
-        val postRef = firestore.collection("posts").document(postId)
-        firestore.runTransaction { transaction ->
-            val post = transaction.get(postRef).toObject<Post>(Post::class.java) ?: return@runTransaction
-            val newLikes = if (isLiked) post.likesCount - 1 else post.likesCount + 1
-            transaction.update(postRef, "likesCount", newLikes, "isLiked", !isLiked) // isLiked est par post? Probablement besoin de likes par user séparé pour multi-users
-        }.await()
-        // Note: Pour une app multi-users, mieux avoir une subcollection "likes" par post pour tracker par user et éviter race conditions.
+    suspend fun toggleLikePost(postId: String, isCurrentlyLiked: Boolean) {
+        val currentUserId = auth.currentUser?.uid ?: return
+
+        // On s'assure que postId n'est pas vide pour éviter le crash.
+        if (postId.isBlank()) {
+            Log.e("FirestoreRepository", "Tentative de liker un post avec un ID vide.")
+            return
+        }
+
+        // On construit la référence au document CORRECTEMENT.
+        // C'est ici que se trouvait le bug.
+        val postRef = db.collection("posts").document(postId)
+
+        // On utilise FieldValue pour ajouter ou retirer l'ID de l'utilisateur
+        // de manière atomique (plus sûr).
+        val updateAction = if (isCurrentlyLiked) {
+            FieldValue.arrayRemove(currentUserId)
+        } else {
+            FieldValue.arrayUnion(currentUserId)
+        }
+
+        val likesCountUpdate = if(isCurrentlyLiked) {
+            FieldValue.increment(-1)
+        } else {
+            FieldValue.increment(1)
+        }
+
+        try {
+            db.runTransaction { transaction ->
+                // Étape 1 : Mettre à jour la liste des 'likedBy'
+                transaction.update(postRef, "likedBy", updateAction)
+                // Étape 2 : Mettre à jour le compteur de likes
+                transaction.update(postRef, "likesCount", likesCountUpdate)
+            }.await()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur lors de la mise à jour du like", e)
+        }
     }
 /*
     suspend fun insertMockTrails() {
