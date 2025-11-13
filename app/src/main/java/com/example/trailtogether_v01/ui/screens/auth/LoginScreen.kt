@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +24,13 @@ import com.example.trailtogether_v01.R
 import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * LoginScreen est la composante de l'écran de connexion de l'utilisateur.
+ * @param authState L'état d'authentification de l'utilisateur.
+ * @param onLoginClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Se connecter".
+ * @param onGoogleSignInClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Se connecter avec Google".
+ * @param onNavigateToRegister Une fonction lambda appelée lorsque l'utilisateur clique sur le lien "Pas encore de compte ? S'inscrire".
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -49,7 +55,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 1. Logo
             Image(
                 painter = painterResource(id = R.drawable.trailtogether_logo),
                 contentDescription = "Logo de l'application",
@@ -58,7 +63,6 @@ fun LoginScreen(
                     .padding(bottom = 48.dp)
             )
 
-            // 2. Champs de saisie
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -88,7 +92,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 3. Affichage des erreurs
             if (authState is AuthState.Error) {
                 Text(
                     text = authState.message,
@@ -99,11 +102,9 @@ fun LoginScreen(
                         .padding(vertical = 8.dp)
                 )
             } else {
-                // Espace réservé pour éviter que l'UI ne "saute" quand l'erreur apparaît
                 Spacer(modifier = Modifier.height(38.dp))
             }
 
-            // 4. Bouton de connexion
             Button(
                 onClick = { onLoginClick(email, password) },
                 modifier = Modifier
@@ -125,7 +126,6 @@ fun LoginScreen(
                 Text("Pas encore de compte ? S'inscrire")
             }
 
-            // 6. Séparateur "ou"
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -138,7 +138,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 7. Bouton de connexion Google (corrigé)
             OutlinedButton(
                 onClick = onGoogleSignInClick, // Appel de la bonne fonction
                 modifier = Modifier

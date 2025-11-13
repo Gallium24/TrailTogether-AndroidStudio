@@ -1,5 +1,9 @@
 package com.example.trailtogether_v01.navigation
 
+/**
+ * Screen est une sealed class qui représente les différents écrans de l'application.
+ * Chaque écran a une route unique qui est utilisée pour identifier l'écran dans la navigation.
+ */
 sealed class Screen(val route: String) {
     // Écrans d'authentification
     object Login : Screen("login_screen")

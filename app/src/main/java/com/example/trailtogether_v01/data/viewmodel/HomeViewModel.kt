@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+/**
+ * HomeViewModel est responsable de la logique de l'écran d'accueil (HomeScreen).
+ * Ses principales responsabilités sont :
+ * - Charger la liste complète des sentiers depuis le FirestoreRepository.
+ * - Gérer l'état de la barre de recherche (searchQuery).
+ * - Gérer l'état des filtres de difficulté (selectedDifficulty).
+ * - Exposer une liste de sentiers filtrée (filteredTrails) que l'UI peut observer.
+ */
 class HomeViewModel : ViewModel() {
     private val repository = FirestoreRepository()
 
@@ -64,8 +72,6 @@ class HomeViewModel : ViewModel() {
     }
 
     fun getTrailById(trailId: String): Trail? {
-        // Cette fonction recherche dans la liste complète des randonnées
-        // et retourne celle qui correspond à l'ID, ou null si non trouvée.
         return _trails.value.find { it.id == trailId }
     }
 

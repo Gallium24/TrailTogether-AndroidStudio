@@ -1,8 +1,6 @@
 package com.example.trailtogether_v01.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.example.trailtogether_v01.data.models.Difficulty
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * DifficultyFilterChips est une composante qui représente les filtres de difficulté.
+ * @param selectedDifficulty La difficulté actuellement sélectionnée.
+ * @param onDifficultySelected Une fonction lambda appelée lorsque l'utilisateur sélectionne une nouvelle difficulté.
+ * L'argument est la nouvelle difficulté sélectionnée.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DifficultyFilterChips(

@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trailtogether_v01.data.viewmodel.ProfileViewModel
 
+/**
+ * EditProfileScreen est la composante de l'écran de modification du profil.
+ * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
+ * @param profileViewModel Le ViewModel du profil.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(

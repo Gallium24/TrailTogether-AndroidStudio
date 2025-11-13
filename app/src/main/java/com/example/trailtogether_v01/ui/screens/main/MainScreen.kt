@@ -18,13 +18,15 @@ import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 
+/**
+ * MainScreen est la composante principale de l'application. Il gère l'affichage des différents écrans de l'application.
+ * @param onLogout Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Déconnexion".
+ */
 @Composable
 fun MainScreen(onLogout: () -> Unit) {
     val navController = rememberNavController()
 
-    // On appelle BottomNavBar qui contient maintenant le Scaffold
     BottomNavBar(navController = navController) { innerPadding ->
-        // Et on passe le NavHost comme contenu
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
@@ -82,7 +84,6 @@ fun MainScreen(onLogout: () -> Unit) {
                     onPlanEventClick = {
                         // On navigue vers la route du Calendrier
                         navController.navigate(Screen.Calendar.route) {
-                            // On nettoie la pile pour éviter les retours étranges
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }

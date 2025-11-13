@@ -33,7 +33,11 @@ import androidx.compose.ui.draw.clip
 import androidx.core.content.ContextCompat
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 
-
+/**
+ * HomeScreen est la composante de l'écran d'accueil.
+ * @param onNavigateToTrailDetail Une fonction lambda appelée lorsque l'utilisateur clique sur un itinéraire.
+ * @param homeViewModel Le ViewModel de l'accueil.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -108,7 +112,7 @@ fun HomeScreen(
 //            contentAlignment = Alignment.Center
 //        ) {
 //            Text(
-//                text = "🗺️ CARTE INTERACTIVE\nSentiers et parcours",
+//                text = "CARTE INTERACTIVE\nSentiers et parcours",
 //                color = Color.DarkGray,
 //                fontSize = 16.sp,
 //                fontWeight = FontWeight.Bold

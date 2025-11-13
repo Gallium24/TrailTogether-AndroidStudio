@@ -3,28 +3,15 @@ package com.example.trailtogether_v01.navigation
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.trailtogether_v01.data.viewmodel.AuthState
-import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.data.viewmodel.AuthViewModel
 import com.example.trailtogether_v01.ui.screens.auth.LoginScreen
 import com.example.trailtogether_v01.ui.screens.auth.RegisterScreen
-import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
-import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
-import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
-import com.example.trailtogether_v01.ui.screens.home.HomeScreen
-import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
-import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
-import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
-
 
 @Composable
 fun NavGraph(

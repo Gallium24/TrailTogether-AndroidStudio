@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,6 +24,11 @@ data class BottomNavItem(
     val label: String
 )
 
+/**
+ * BottomNavBar est une composante qui représente la barre de navigation inférieure de l'application.
+ * @param navController NavController représente la navigation entre les différents écrans de l'application.
+ * @param content Slot qui contient le contenu de l'écran actuel.
+ */
 @Composable
 fun BottomNavBar(
     navController: NavController,

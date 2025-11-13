@@ -24,6 +24,11 @@ import com.example.trailtogether_v01.data.repository.MockRepository
 import com.example.trailtogether_v01.ui.components.EventCard
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 
+/**
+ * CalendarScreen est la composante de l'écran du calendrier.
+ * @param onNavigateToEventDetail Une fonction lambda appelée lorsque l'utilisateur clique sur un événement.
+ * L'argument est l'ID de l'événement.
+ */
 @Composable
 fun CalendarScreen(
     onNavigateToEventDetail: (String) -> Unit
@@ -72,7 +77,6 @@ fun CalendarScreen(
             .background(BackgroundBeige)
             .padding(16.dp)
     ) {
-        // Calendar card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -136,7 +140,7 @@ fun CalendarScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Calendar grid
+                // Calendar grille
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(7),
                     modifier = Modifier.height(250.dp),

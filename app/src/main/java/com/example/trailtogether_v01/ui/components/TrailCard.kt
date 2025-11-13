@@ -20,6 +20,11 @@ import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
 
+/**
+ * TrailCard est une composante qui représente une carte descriptive d'une randonnée.
+ * @param trail Le trail à afficher.
+ * @param onClick Une fonction lambda appelée lorsque l'utilisateur clique sur la carte.
+ */
 @Composable
 fun TrailCard(
     trail: Trail,

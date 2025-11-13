@@ -1,9 +1,7 @@
 package com.example.trailtogether_v01
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.trailtogether_v01.data.viewmodel.AuthState
@@ -12,6 +10,10 @@ import com.example.trailtogether_v01.navigation.NavGraph
 import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.ui.components.BottomNavBar
 
+/**
+ * TrailTogetherApp est la composante principale de l'application.
+ * Elle gère l'affichage des différents écrans de l'application.
+ */
 @Composable
 fun TrailTogetherApp(
     authViewModel: AuthViewModel = viewModel()

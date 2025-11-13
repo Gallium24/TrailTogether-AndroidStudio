@@ -1,7 +1,6 @@
 package com.example.trailtogether_v01.data.viewmodel
 
 import com.google.firebase.Timestamp
-import androidx.compose.foundation.layout.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trailtogether_v01.data.models.Post
@@ -14,6 +13,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * FeedViewModel est responsable de la logique du flux d'actualités (FeedScreen).
+ * Ses principales responsabilités
+ * - Charger les posts depuis le FirestoreRepository.
+ * - Gérer les likes sur les posts.
+ * - Exposer l'état des posts (posts) et du chargement (isLoading) que l'UI peut observer.
+ */
 class FeedViewModel : ViewModel() {
     private val repository = FirestoreRepository()
     private val auth = Firebase.auth
@@ -58,7 +64,7 @@ class FeedViewModel : ViewModel() {
         val authorName = currentUser.displayName ?: "Utilisateur anonyme"
 
         val post = Post(
-            id = "", // Firestore générera l'ID
+            id = "", // Firestore génére l'ID
             authorId = currentUser.uid,
             authorName = authorName,
             authorUsername = currentUser.email?.substringBefore('@') ?: "anonyme",
@@ -70,13 +76,12 @@ class FeedViewModel : ViewModel() {
             timestamp = Timestamp.now()
         )
 
-        // 'db' est maintenant défini
         db.collection("posts").add(post)
             .addOnSuccessListener {
-                onSuccess() // Opération réussie
+                onSuccess()
             }
             .addOnFailureListener { exception ->
-                onFailure(exception) // Opération échouée
+                onFailure(exception)
             }
     }
 }

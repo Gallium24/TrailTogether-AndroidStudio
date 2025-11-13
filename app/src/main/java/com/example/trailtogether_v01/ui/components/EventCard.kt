@@ -19,6 +19,9 @@ import com.example.trailtogether_v01.data.models.Event
 import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
 
+/**
+ * EventCard est une composante qui représente une carte d'événement.
+ */
 @Composable
 fun EventCard(
     event: Event,

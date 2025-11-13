@@ -23,6 +23,12 @@ import com.example.trailtogether_v01.data.viewmodel.ProfileViewModel
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * ProfileScreen est la composante de l'écran de profil.
+ * @param onLogout Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Déconnexion".
+ * @param onNavigateToEditProfile Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Modifier le profil".
+ * @param profileViewModel Le ViewModel du profil.
+ */
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit,

@@ -12,6 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trailtogether_v01.data.viewmodel.FeedViewModel
 
+/**
+ * CreatePostScreen est la composante de l'écran de création de publication.
+ * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
+ * @param feedViewModel Le ViewModel de la publication.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePostScreen(
@@ -34,32 +39,24 @@ fun CreatePostScreen(
                 actions = {
                     Button(
                         onClick = {
-                            // On ne fait rien si la publication est déjà en cours ou si le contenu est vide
                             if (isPublishing || content.isBlank()) return@Button
 
-                            // On passe l'état à "en cours de publication" pour désactiver le bouton
                             isPublishing = true
 
-                            // On appelle la fonction du FeedViewModel
                             feedViewModel.createPost(
                                 trailId = selectedTrailId,
                                 content = content,
                                 onSuccess = {
-                                    // En cas de succès, on ferme l'écran
                                     onNavigateBack()
                                 },
                                 onFailure = {
-                                    // En cas d'échec, on réactive le bouton pour que l'utilisateur puisse réessayer
                                     isPublishing = false
-                                    // Idéalement, afficher un message d'erreur ici (Snackbar, etc.)
                                 }
                             )
                         },
-                        // Le bouton est activé uniquement si 'isPublishing' est false ET le contenu n'est pas vide.
                         enabled = !isPublishing && content.isNotBlank(),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
-                        // Affiche une roue de chargement pendant la publication
                         if (isPublishing) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),

@@ -12,7 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore // Ajouté
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +20,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * AuthViewModel gère toute la logique liée à l'authentification des utilisateurs.
+ * Il expose l'état d'authentification (AuthState) et fournit des méthodes pour :
+ * - Se connecter avec email/mot de passe.
+ * - S'inscrire avec email/mot de passe.
+ * - Se connecter avec un compte Google.
+ * - Se déconnecter.
+ * Il interagit avec FirebaseAuth pour effectuer ces opérations.
+ */
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth: FirebaseAuth = Firebase.auth
@@ -42,7 +51,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val firebaseUser = auth.currentUser
             if (firebaseUser != null) {
-                // Fetch from Firestore
                 val userDoc = firestore.collection("users").document(firebaseUser.uid).get().await()
                 val user = userDoc.toObject(User::class.java)
                 if (user != null) {

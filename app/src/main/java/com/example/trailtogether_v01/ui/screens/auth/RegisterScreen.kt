@@ -25,6 +25,12 @@ import com.example.trailtogether_v01.R
 import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * RegisterScreen est la composante de l'écran d'inscription de l'utilisateur.
+ * @param authState L'état d'authentification de l'utilisateur.
+ * @param onRegisterClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "S'inscrire".
+ * @param onNavigateToLogin Une fonction lambda appelée lorsque l'utilisateur clique sur le lien "Déjà un compte ? Se connecter".
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -48,7 +54,6 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 1. Logo
             Image(
                 painter = painterResource(id = R.drawable.trailtogether_logo),
                 contentDescription = "Logo de l'application",
@@ -57,7 +62,6 @@ fun RegisterScreen(
                     .padding(bottom = 48.dp)
             )
 
-            // 2. Champs de saisie
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -100,7 +104,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 3. Affichage des erreurs
             if (authState is AuthState.Error) {
                 Text(
                     text = authState.message,
@@ -114,7 +117,6 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(38.dp))
             }
 
-            // 4. Bouton d'inscription
             Button(
                 onClick = { onRegisterClick(name, email, password) },
                 modifier = Modifier
@@ -131,7 +133,6 @@ fun RegisterScreen(
                 }
             }
 
-            // 5. Lien pour retourner à la connexion
             TextButton(onClick = onNavigateToLogin, enabled = !isLoading) {
                 Text("Déjà un compte ? Se connecter")
             }

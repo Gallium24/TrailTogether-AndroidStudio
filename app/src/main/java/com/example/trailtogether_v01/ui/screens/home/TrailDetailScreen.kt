@@ -19,12 +19,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.trailtogether_v01.data.repository.MockRepository
 import com.example.trailtogether_v01.data.viewmodel.TrailDetailViewModel
 import com.example.trailtogether_v01.ui.components.DifficultyBadge
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * TrailDetailScreen est la composante de l'écran de détail d'une randonnée.
+ * @param trailId L'ID de la randonnée à afficher.
+ * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
+ * @param onPlanEventClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Planifier une sortie".
+ * @param detailViewModel Le ViewModel de détail de la randonnée.
+ */
 @Composable
 fun TrailDetailScreen(
     trailId: String,
@@ -73,7 +79,6 @@ fun TrailDetailScreen(
             // Une fois le chargement terminé, on vérifie si on a bien une randonnée.
             trail?.let { t ->
                 // Si la randonnée existe, on affiche ses détails.
-                // Le code ci-dessous est le même que le vôtre, mais il utilise maintenant 't' qui vient de Firestore.
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -89,7 +94,7 @@ fun TrailDetailScreen(
                             .background(Color.LightGray, RoundedCornerShape(16.dp))
                     )
 
-                    // Title and difficulty
+                    // Titre and difficultés
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,

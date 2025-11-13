@@ -19,6 +19,14 @@ import com.example.trailtogether_v01.navigation.NavGraph
 import com.example.trailtogether_v01.ui.screens.main.MainScreen
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 import com.example.trailtogether_v01.utils.OsmdroidInitializer
+/**
+ * MainActivity est le point d'entrée unique de l'application.
+ * Son rôle est de déterminer l'état d'authentification de l'utilisateur (connecté ou non)
+ * et d'afficher le graphe de navigation approprié :
+ * - Si l'utilisateur n'est pas connecté, affiche le NavGraph d'authentification (Login/Register).
+ * - Si l'utilisateur est connecté, affiche le MainScreen qui contient la navigation principale de l'application.
+ */
+
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()

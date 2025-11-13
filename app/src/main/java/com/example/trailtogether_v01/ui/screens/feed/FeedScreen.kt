@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,6 +17,11 @@ import com.example.trailtogether_v01.data.viewmodel.FeedViewModel
 import com.example.trailtogether_v01.ui.components.PostCard
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * FeedScreen est la composante de l'écran du Feed.
+ * @param onNavigateToCreatePost Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Créer un post".
+ * @param feedViewModel Le ViewModel du Feed.
+ */
 @Composable
 fun FeedScreen(
     onNavigateToCreatePost: () -> Unit,
