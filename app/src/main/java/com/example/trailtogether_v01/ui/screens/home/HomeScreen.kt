@@ -130,8 +130,8 @@ fun HomeScreen(
                         maxZoomLevel = 20.0
                         minZoomLevel = 5.0
 
-                        // Center on Chamonix, France (trail hub)
-                        controller.setCenter(GeoPoint(45.924, 6.868))
+                        // On centre sur Chicoutimi par défaut
+                        controller.setCenter(GeoPoint(48.4284, -71.0598))
                         controller.setZoom(10.0)
                     }
                 },

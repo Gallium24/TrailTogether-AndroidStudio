@@ -110,8 +110,8 @@ class MockRepository {
             rating = 4.5f,
             reviewsCount = 234,
             description = "Magnifique sentier à travers la forêt de sapins avec vue panoramique.",
-            latitude = 45.9237,
-            longitude = 6.8694,
+            latitude = 48.4243,
+            longitude = -71.0766,
             tags = listOf("Forêt", "Vue panoramique", "Famille")
         ),
         Trail(
@@ -124,8 +124,8 @@ class MockRepository {
             rating = 4.8f,
             reviewsCount = 156,
             description = "Sentier exigeant avec passages techniques et vues exceptionnelles.",
-            latitude = 45.8992,
-            longitude = 6.1294,
+            latitude = 48.4284,
+            longitude = -71.0598,
             tags = listOf("Technique", "Vue", "Expérimenté")
         ),
         Trail(
@@ -138,8 +138,8 @@ class MockRepository {
             rating = 4.9f,
             reviewsCount = 89,
             description = "Ascension mythique réservée aux randonneurs expérimentés.",
-            latitude = 45.8326,
-            longitude = 6.8652,
+            latitude = 48.3833,
+            longitude = -71.0667,
             tags = listOf("Haute montagne", "Glacier", "Expert")
         ),
         Trail(
@@ -152,8 +152,8 @@ class MockRepository {
             rating = 4.2f,
             reviewsCount = 456,
             description = "Promenade facile en bord de lac, idéale pour les familles.",
-            latitude = 45.9000,
-            longitude = 6.1167,
+            latitude = 45.5019,
+            longitude = -73.5878,
             tags = listOf("Lac", "Facile", "Famille")
         )
     )
