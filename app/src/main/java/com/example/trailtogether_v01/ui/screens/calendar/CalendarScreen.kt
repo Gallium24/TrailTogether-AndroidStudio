@@ -10,7 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,57 +21,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trailtogether_v01.data.repository.FirestoreRepository
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trailtogether_v01.data.viewmodel.CalendarViewModel
 import com.example.trailtogether_v01.ui.components.EventCard
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
-/**
- * CalendarScreen est la composante de l'écran du calendrier.
- * @param onNavigateToEventDetail Une fonction lambda appelée lorsque l'utilisateur clique sur un événement.
- * L'argument est l'ID de l'événement.
- */
 @Composable
 fun CalendarScreen(
-    onNavigateToEventDetail: (String) -> Unit
+    onNavigateToEventDetail: (String) -> Unit,
+    viewModel: CalendarViewModel = viewModel()
 ) {
-    val repository = FirestoreRepository()
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val eventsForDate by viewModel.eventsForSelectedDate.collectAsState()
+    val allEvents by viewModel.allEvents.collectAsState()
 
-    var selectedDate by remember { mutableStateOf(15) }
-    var selectedMonth by remember { mutableStateOf("Janvier") }
-
-    // Mock events
-    val events = remember {
-        listOf(
-            com.example.trailtogether_v01.data.models.Event(
-                id = "event_1",
-                trailId = "trail_1",
-                trailName = "Randonnée des Sapins",
-                organizerId = "user_2",
-                organizerName = "Marie Martin",
-                date = "2025-01-15",
-                time = "13:00",
-                duration = "4h 30min",
-                distance = "12.5 km",
-                difficulty = com.example.trailtogether_v01.data.models.Difficulty.MODERATE,
-                participantsCount = 8,
-                maxParticipants = 15
-            ),
-            com.example.trailtogether_v01.data.models.Event(
-                id = "event_2",
-                trailId = "trail_2",
-                trailName = "Randonnée des Pins",
-                organizerId = "user_3",
-                organizerName = "Pierre Dubois",
-                date = "2025-01-15",
-                time = "09:00",
-                duration = "8h 15min",
-                distance = "30.2 km",
-                difficulty = com.example.trailtogether_v01.data.models.Difficulty.HARD,
-                participantsCount = 5,
-                maxParticipants = 10
-            )
-        )
-    }
+    // Gestion simple du changement de mois (pour l'affichage)
+    // Note: Pour une vraie gestion complète, le ViewModel devrait gérer le "Mois affiché" indépendamment de la "Date sélectionnée".
+    // Ici, on synchronise le mois affiché sur la date sélectionnée pour simplifier.
+    val monthName = selectedDate.month.getDisplayName(TextStyle.FULL, Locale.FRENCH).replaceFirstChar { it.uppercase() }
+    val year = selectedDate.year
 
     Column(
         modifier = Modifier
@@ -78,80 +51,63 @@ fun CalendarScreen(
             .background(BackgroundBeige)
             .padding(16.dp)
     ) {
+        // --- Calendrier ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                // Month selector
+                // Header Mois
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Mois précédent",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .background(Color.Red, CircleShape)
-                                .padding(4.dp)
-                        )
+                    IconButton(onClick = { viewModel.onDateSelected(selectedDate.minusMonths(1)) }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Précédent")
                     }
                     Text(
-                        text = selectedMonth,
+                        text = "$monthName $year",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Default.ArrowForward,
-                            contentDescription = "Mois suivant",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .background(Color.Red, CircleShape)
-                                .padding(4.dp)
-                        )
+                    IconButton(onClick = { viewModel.onDateSelected(selectedDate.plusMonths(1)) }) {
+                        Icon(Icons.Default.ArrowForward, contentDescription = "Suivant")
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Days of week
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
+                // Jours de la semaine
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     listOf("Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa").forEach { day ->
-                        Text(
-                            text = day,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            color = Color.Gray
-                        )
+                        Text(text = day, fontWeight = FontWeight.SemiBold, color = Color.Gray)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Calendar grille
+                // Grille des jours
+                // Note : Logique simplifiée pour générer les jours du mois
+                val daysInMonth = selectedDate.lengthOfMonth()
+                val firstDayOfMonth = selectedDate.withDayOfMonth(1).dayOfWeek.value % 7 // Dimanche = 0 ou 7 selon config
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(7),
-                    modifier = Modifier.height(250.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.height(240.dp)
                 ) {
-                    items(31) { index ->
+                    // Espaces vides avant le 1er du mois
+                    items(firstDayOfMonth) { Spacer(modifier = Modifier.size(40.dp)) }
+
+                    // Jours du mois
+                    items(daysInMonth) { index ->
                         val day = index + 1
-                        val isSelected = day == selectedDate
-                        val hasEvent = day == 15 || day == 20 || day == 28
+                        val currentDate = selectedDate.withDayOfMonth(day)
+                        val isSelected = currentDate == selectedDate
+                        val dateString = currentDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                        val hasEvent = allEvents.any { it.date == dateString }
 
                         Box(
                             modifier = Modifier
@@ -164,13 +120,12 @@ fun CalendarScreen(
                                     },
                                     CircleShape
                                 )
-                                .clickable { selectedDate = day },
+                                .clickable { viewModel.onDateSelected(currentDate) },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = day.toString(),
                                 color = if (isSelected) Color.White else Color.Black,
-                                fontSize = 14.sp,
                                 fontWeight = if (hasEvent) FontWeight.Bold else FontWeight.Normal
                             )
                         }
@@ -181,36 +136,22 @@ fun CalendarScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Events list
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Évènements du $selectedDate $selectedMonth",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-            IconButton(onClick = { }) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Ajouter événement",
-                    tint = com.example.trailtogether_v01.ui.theme.TrailGreen
-                )
-            }
-        }
+        // --- Liste des événements ---
+        Text(
+            text = "Événements du ${selectedDate.dayOfMonth} $monthName",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(events) { event ->
-                EventCard(
-                    event = event,
-                    onClick = { onNavigateToEventDetail(event.id) }
-                )
+        if (eventsForDate.isEmpty()) {
+            Text("Aucun événement prévu ce jour-là.", color = Color.Gray, modifier = Modifier.padding(top = 16.dp))
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(eventsForDate) { event ->
+                    EventCard(event = event, onClick = { onNavigateToEventDetail(event.id) })
+                }
             }
         }
     }

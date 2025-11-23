@@ -14,6 +14,8 @@ import com.example.trailtogether_v01.ui.screens.home.HomeScreen
 import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
+import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
+
 
 /**
  * MainNavGraph est le graphe de navigation interne de l'application.
@@ -30,6 +32,9 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
         composable(Screen.Home.route) {
             HomeScreen(onNavigateToTrailDetail = { trailId ->
                 navController.navigate("trail_detail_screen/$trailId")
+            },
+            onNavigateToCalendar = {
+                navController.navigate(Screen.Calendar.route)
             })
         }
         composable(Screen.Feed.route) {
@@ -76,15 +81,18 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 onNavigateBack = { navController.popBackStack() },
                 // --- LOGIQUE POUR ALLER AU CALENDRIER ---
                 onPlanEventClick = {
-                    // On navigue vers la route du Calendrier
-                    navController.navigate(Screen.Calendar.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(Screen.CreateEvent.createRoute(trailId))
                 }
+            )
+        }
+        composable(
+            route = Screen.CreateEvent.route,
+            arguments = listOf(navArgument("trailId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
+            CreateEventScreen(
+                trailId = trailId,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -42,6 +43,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 @Composable
 fun HomeScreen(
     onNavigateToTrailDetail: (String) -> Unit,
+    onNavigateToCalendar: () -> Unit,
     homeViewModel: HomeViewModel = viewModel()
 ) {
     val filteredTrails by homeViewModel.filteredTrails.collectAsState()
@@ -64,10 +66,19 @@ fun HomeScreen(
             Image(
                 painter = painterResource(id = R.drawable.trailtogether_logo),
                 contentDescription = "Logo TrailTogether",
-                modifier = Modifier.height(30.dp) // Ajustez la hauteur selon vos préférences
+                modifier = Modifier.height(30.dp)
             )
-            IconButton(onClick = { }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onNavigateToCalendar) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Calendrier",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                IconButton(onClick = { }) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
             }
         }
 

@@ -193,6 +193,24 @@ class FirestoreRepository {
             Log.e("FirestoreRepository", "Erreur lors de la mise à jour du like", e)
         }
     }
+
+    // --- Ajout pour la création d'événement ---
+    suspend fun createEvent(event: Event): Result<String> {
+        return try {
+            // On laisse Firestore générer l'ID si celui de l'event est vide
+            val docRef = if (event.id.isBlank()) {
+                firestore.collection("events").document()
+            } else {
+                firestore.collection("events").document(event.id)
+            }
+
+            val finalEvent = event.copy(id = docRef.id)
+            docRef.set(finalEvent).await()
+            Result.success(docRef.id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 /*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.ui.theme.TrailGreen
@@ -23,7 +24,6 @@ data class BottomNavItem(
     val icon: ImageVector,
     val label: String
 )
-
 /**
  * BottomNavBar est une composante qui représente la barre de navigation inférieure de l'application.
  * @param navController NavController représente la navigation entre les différents écrans de l'application.
@@ -50,26 +50,36 @@ fun BottomNavBar(
                 modifier = Modifier.height(110.dp)
             ) {
                 items.forEachIndexed { index, item ->
-                    val isSelected = currentRoute == item.route
+                    // On considère l'item sélectionné si la route correspond
+                    // OU si on est sur l'Accueil et qu'on est dans une sous-route (Calendrier ou Détail)
+                    val isSelected = currentRoute == item.route ||
+                            (item.route == Screen.Home.route &&
+                                    (currentRoute == Screen.Calendar.route || currentRoute?.startsWith("trail_detail") == true))
+
                     val isCenter = index == 1
 
                     NavigationBarItem(
                         selected = isSelected,
                         onClick = {
-                            if (currentRoute != item.route) {
-                                navController.navigate(item.route) {
-                                    popUpTo(Screen.Home.route) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+                            navController.navigate(item.route) {
+                                // Pop jusqu'au début du graphe pour éviter d'empiler les écrans
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
+                                launchSingleTop = true
+
+                                // CORRECTION ICI :
+                                // On restaure l'état UNIQUEMENT si ce n'est pas l'écran Home.
+                                // Pour Home, on veut "reset" à la racine (la liste des trails) et ne pas revenir sur le Calendrier.
+                                restoreState = item.route != Screen.Home.route
                             }
                         },
                         icon = {
                             if (isCenter) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxHeight() // Remplit toute la hauteur disponible
-                                        .aspectRatio(1f) // Force la largeur à être égale à la hauteur, créant un carré
+                                        .fillMaxHeight()
+                                        .aspectRatio(1f)
                                         .background(
                                             TrailGreen,
                                             shape = CircleShape
@@ -91,7 +101,7 @@ fun BottomNavBar(
                                 )
                             }
                         },
-                        label = { if (!isCenter) Text(item.label) }, // Ne pas afficher de label pour le bouton central
+                        label = { if (!isCenter) Text(item.label) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = TrailGreen,
                             unselectedIconColor = Color.Gray,
