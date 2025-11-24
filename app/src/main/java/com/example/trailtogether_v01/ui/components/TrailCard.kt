@@ -20,11 +20,6 @@ import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
 
-/**
- * TrailCard est une composante qui représente une carte descriptive d'une randonnée.
- * @param trail Le trail à afficher.
- * @param onClick Une fonction lambda appelée lorsque l'utilisateur clique sur la carte.
- */
 @Composable
 fun TrailCard(
     trail: Trail,
@@ -79,28 +74,50 @@ fun TrailCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 TrailStat(
                     icon = Icons.Default.DirectionsWalk,
-                    value = "${trail.distance} km"
+                    value = trail.distance
                 )
                 TrailStat(
                     icon = Icons.Default.Schedule,
                     value = trail.duration
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = Color(0xFFFFC107)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${trail.rating} (${trail.reviewsCount})",
-                        fontSize = 14.sp
-                    )
+
+                // Afficher rating uniquement si disponible (trails Firestore notamment)
+                if (trail.rating > 0 || trail.reviewsCount > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Color(0xFFFFC107)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${trail.rating} (${trail.reviewsCount})",
+                            fontSize = 14.sp
+                        )
+                    }
+                } else if (trail.source == "osm") {
+                    // Pour les trails OSM, afficher le dénivelé s'il est disponible
+                    if (trail.elevation.isNotEmpty()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.TrendingUp,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = trail.elevation.split("/").firstOrNull()?.trim() ?: trail.elevation,
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
                 }
             }
         }

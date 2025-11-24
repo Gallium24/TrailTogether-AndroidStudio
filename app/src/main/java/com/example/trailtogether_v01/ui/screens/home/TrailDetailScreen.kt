@@ -23,29 +23,49 @@ import com.example.trailtogether_v01.data.viewmodel.TrailDetailViewModel
 import com.example.trailtogether_v01.ui.components.DifficultyBadge
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.views.MapView
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import com.example.trailtogether_v01.data.models.Difficulty
+import com.example.trailtogether_v01.data.models.Trail
+import android.util.Log
 
-/**
- * TrailDetailScreen est la composante de l'écran de détail d'une randonnée.
- * @param trailId L'ID de la randonnée à afficher.
- * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
- * @param onPlanEventClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Planifier une sortie".
- * @param detailViewModel Le ViewModel de détail de la randonnée.
- */
 @Composable
 fun TrailDetailScreen(
     trailId: String,
+    preloadedTrail: Trail? = null,
     onNavigateBack: () -> Unit,
     onPlanEventClick: () -> Unit,
     detailViewModel: TrailDetailViewModel = viewModel()
 ) {
-    LaunchedEffect(key1 = trailId) {
-        detailViewModel.fetchTrailById(trailId)
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = trailId, key2 = preloadedTrail) {
+        Log.d("TrailDetailScreen", "LaunchedEffect déclenché")
+        Log.d("TrailDetailScreen", "  - trailId: $trailId")
+        Log.d("TrailDetailScreen", "  - preloadedTrail: ${preloadedTrail?.name ?: "null"}")
+
+        if (preloadedTrail != null) {
+            Log.d("TrailDetailScreen", "Utilisation du preloadedTrail")
+            detailViewModel.setTrail(preloadedTrail)
+        } else {
+            Log.d("TrailDetailScreen", "Pas de preloadedTrail, recherche Firestore")
+            detailViewModel.fetchTrailById(trailId)
+        }
     }
 
-
-    // On observe l'état de la randonnée et du chargement depuis le ViewModel.
     val trail by detailViewModel.trail.collectAsState()
     val isLoading by detailViewModel.isLoading.collectAsState()
+
+    Log.d("TrailDetailScreen", "Recomposition - trail: ${trail?.name ?: "null"}, isLoading: $isLoading")
 
     Column(
         modifier = Modifier
@@ -71,14 +91,14 @@ fun TrailDetailScreen(
         }
 
         if (isLoading) {
-            // Si c'est en cours de chargement, on affiche une roue.
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
+                Log.d("TrailDetailScreen", "Affichage du loading")
             }
         } else {
-            // Une fois le chargement terminé, on vérifie si on a bien une randonnée.
             trail?.let { t ->
-                // Si la randonnée existe, on affiche ses détails.
+                Log.d("TrailDetailScreen", "Affichage du trail: ${t.name}")
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -86,15 +106,79 @@ fun TrailDetailScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Image placeholder
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(250.dp)
-                            .background(Color.LightGray, RoundedCornerShape(16.dp))
-                    )
 
-                    // Titre and difficultés
+                    // CARTE avec tracé
+                    if (t.hasValidCoordinates()) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            AndroidView(
+                                factory = { ctx ->
+                                    MapView(ctx).apply {
+                                        setTileSource(TileSourceFactory.MAPNIK)
+                                        setMultiTouchControls(true)
+                                        maxZoomLevel = 18.0
+                                        minZoomLevel = 6.0
+
+                                        val startPoint = t.getTrailStartPoint()
+                                        startPoint?.let { point ->
+                                            controller.setZoom(14.0)
+                                            controller.setCenter(point)
+
+                                            val marker = Marker(this).apply {
+                                                position = point
+                                                title = t.name
+                                                icon = createDetailMarkerIcon(ctx, t.difficulty)
+                                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                            }
+                                            overlays.add(marker)
+
+                                            val pathPoints = t.getPathAsGeoPoints()
+                                            if (pathPoints.isNotEmpty()) {
+                                                val polyline = Polyline().apply {
+                                                    setPoints(pathPoints)
+                                                    outlinePaint.color = when (t.difficulty) {
+                                                        Difficulty.EASY -> android.graphics.Color.GREEN
+                                                        Difficulty.MODERATE -> android.graphics.Color.rgb(255, 152, 0) // Orange
+                                                        Difficulty.HARD -> android.graphics.Color.RED
+                                                        Difficulty.EXPERT -> android.graphics.Color.BLACK
+                                                    }
+                                                    outlinePaint.strokeWidth = 8f
+                                                }
+                                                overlays.add(polyline)
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.LightGray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.Landscape,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = Color.Gray
+                                )
+                                Text("Carte non disponible", color = Color.Gray)
+                            }
+                        }
+                    }
+
+                    // Titre et difficulté
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -121,39 +205,106 @@ fun TrailDetailScreen(
                         Text(text = t.location, fontSize = 16.sp, color = Color.Gray)
                     }
 
-                    // Stats
-                    Row(
+                    // Stats Card
+                    Card(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
                     ) {
-                        StatColumn(
-                            icon = Icons.Default.DirectionsWalk,
-                            label = "Distance",
-                            value = "${t.distance} km"
-                        )
-                        StatColumn(
-                            icon = Icons.Default.Schedule,
-                            label = "Durée",
-                            value = t.duration
-                        )
-                        StatColumn(
-                            icon = Icons.Default.Star,
-                            label = "Note",
-                            value = "${t.rating}/5"
-                        )
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                StatColumn(
+                                    icon = Icons.Default.DirectionsWalk,
+                                    label = "Distance",
+                                    value = t.distance
+                                )
+                                StatColumn(
+                                    icon = Icons.Default.Schedule,
+                                    label = "Durée",
+                                    value = t.duration
+                                )
+
+                                // Rating OU Dénivelé
+                                if (t.source == "firestore" && t.rating > 0) {
+                                    StatColumn(
+                                        icon = Icons.Default.Star,
+                                        label = "Note",
+                                        value = "${t.rating}/5"
+                                    )
+                                } else if (t.elevation.isNotEmpty()) {
+                                    StatColumn(
+                                        icon = Icons.Default.TrendingUp,
+                                        label = "Dénivelé",
+                                        value = t.elevation.split("/").firstOrNull()?.trim() ?: t.elevation
+                                    )
+                                } else {
+                                    StatColumn(
+                                        icon = Icons.Default.Star,
+                                        label = "Note",
+                                        value = "N/A"
+                                    )
+                                }
+                            }
+
+                            if (t.source == "firestore" && t.reviewsCount > 0) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "${t.reviewsCount} avis",
+                                    fontSize = 12.sp,
+                                    color = Color.Gray,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                            }
+                        }
                     }
+
                     Divider()
+
+                    // Description
                     Text(
                         text = "Description",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = t.description,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
-                    )
-                    if (t.tags.isNotEmpty()) {
+
+                    if (t.description.isNotEmpty()) {
+                        Text(
+                            text = t.description,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp
+                        )
+                    } else {
+                        Text(
+                            text = "Aucune description disponible pour ce sentier.",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                        )
+                    }
+
+                    // Dénivelé complet si OSM
+                    if (t.source == "osm" && t.elevation.isNotEmpty()) {
+                        Divider()
+                        Text(
+                            text = "Informations",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        InfoRow("Dénivelé", t.elevation)
+                        if (t.tags.isNotEmpty()) {
+                            InfoRow("Type", t.tags.firstOrNull() ?: "path")
+                            if (t.tags.size > 1) {
+                                InfoRow("Surface", t.tags[1])
+                            }
+                        }
+                    }
+
+                    // Tags Firestore
+                    if (t.tags.isNotEmpty() && t.source == "firestore") {
                         Text(
                             text = "Tags",
                             fontSize = 18.sp,
@@ -163,11 +314,12 @@ fun TrailDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            t.tags.forEach { tag ->
+                            t.tags.take(5).forEach { tag ->
                                 AssistChip(onClick = {}, label = { Text(tag) })
                             }
                         }
                     }
+
                     Button(
                         onClick = onPlanEventClick,
                         modifier = Modifier.fillMaxWidth(),
@@ -184,9 +336,24 @@ fun TrailDetailScreen(
                     }
                 }
             } ?: run {
-                // Si la randonnée n'a pas été trouvée après le chargement, on affiche un message.
+                Log.e("TrailDetailScreen", "Affichage de 'Sentier introuvable'")
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Désolé, cette randonnée n'a pas été trouvée.")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.ErrorOutline,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Sentier introuvable", fontSize = 16.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("ID: $trailId", fontSize = 12.sp, color = Color.Gray)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onNavigateBack) {
+                            Text("Retour")
+                        }
+                    }
                 }
             }
         }
@@ -199,25 +366,58 @@ fun StatColumn(
     label: String,
     value: String
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = TrailGreen,
-            modifier = Modifier.size(24.dp)
-        )
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(icon, contentDescription = null, tint = TrailGreen, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = Color.Gray
-        )
+        Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = label, fontSize = 12.sp, color = Color.Gray)
     }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, fontSize = 14.sp, color = Color.Gray)
+        Text(text = value, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+private fun createDetailMarkerIcon(context: android.content.Context, difficulty: Difficulty): BitmapDrawable {
+    val size = 60
+    val height = 80
+
+    val bitmap = Bitmap.createBitmap(size, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    val paint = Paint().apply {
+        color = when (difficulty) {
+            Difficulty.EASY -> android.graphics.Color.GREEN
+            Difficulty.MODERATE -> android.graphics.Color.rgb(255, 152, 0) // Orange
+            Difficulty.HARD -> android.graphics.Color.RED
+            Difficulty.EXPERT -> android.graphics.Color.BLACK
+        }
+        style = Paint.Style.FILL
+        isAntiAlias = true
+    }
+
+    val centerX = size / 2f
+    val radius = (size / 2f) - 5f
+
+    canvas.drawCircle(centerX, centerX, radius, paint)
+    val path = android.graphics.Path().apply {
+        moveTo(centerX, radius * 2 + 10f)
+        lineTo(centerX - radius, radius)
+        lineTo(centerX + radius, radius)
+        close()
+    }
+    canvas.drawPath(path, paint)
+
+    paint.style = Paint.Style.STROKE
+    paint.strokeWidth = 4f
+    paint.color = android.graphics.Color.WHITE
+    canvas.drawCircle(centerX, centerX, radius, paint)
+
+    return BitmapDrawable(context.resources, bitmap)
 }

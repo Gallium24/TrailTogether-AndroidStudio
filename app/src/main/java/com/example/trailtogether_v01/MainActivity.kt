@@ -15,11 +15,12 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.data.viewmodel.AuthViewModel
-import com.example.trailtogether_v01.navigation.AuthNavGraph
 import com.example.trailtogether_v01.navigation.RootNavGraph
 
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 import com.example.trailtogether_v01.utils.OsmdroidInitializer
+import org.osmdroid.config.Configuration
+
 /**
  * MainActivity est le point d'entrée unique de l'application.
  * Elle gère l'état de l'authentification et la navigation entre les écrans.
@@ -39,6 +40,10 @@ class MainActivity : ComponentActivity() {
         }
 
         OsmdroidInitializer.init(this)
+        Configuration.getInstance().apply {
+            userAgentValue = packageName
+            load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
+        }
 
         /*
         val repository = FirestoreRepository()  // Instance du repo

@@ -1,12 +1,22 @@
 package com.example.trailtogether_v01.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.trailtogether_v01.data.models.Trail
+import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
 import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
 import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
@@ -26,6 +36,19 @@ import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
  */
 @Composable
 fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout: () -> Unit) {
+    val homeViewModel: HomeViewModel = viewModel()
+    val trailCache = remember { mutableMapOf<String, Trail>() }
+
+    val allTrails by homeViewModel.allTrails.collectAsState()
+
+    LaunchedEffect(allTrails) {
+        // Mettre à jour le cache chaque fois que allTrails change
+        allTrails.forEach { trail ->
+            trailCache[trail.id] = trail
+        }
+        Log.d("MainNavGraph", "🔄 Cache mis à jour: ${trailCache.size} trails")
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
@@ -33,13 +56,32 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
     ) {
         // --- Écrans principaux ---
         composable(Screen.Home.route) {
-            HomeScreen(onNavigateToTrailDetail = { trailId ->
-                navController.navigate("trail_detail_screen/$trailId")
-            },
-            onNavigateToCalendar = {
-                navController.navigate(Screen.Calendar.route)
-            })
+            HomeScreen(
+                homeViewModel = homeViewModel,
+                onNavigateToTrailDetail = { trailId ->
+                    Log.d("MainNavGraph", "Navigation vers trail: $trailId")
+                    Log.d("MainNavGraph", "Cache contient ${trailCache.size} trails: ${trailCache.keys.take(5)}")
+
+                    val trail = trailCache[trailId]
+
+                    if (trail != null) {
+                        Log.d("MainNavGraph", "Trail trouvé dans le cache:")
+                        Log.d("MainNavGraph", "  - Nom: ${trail.name}")
+                        Log.d("MainNavGraph", "  - Source: ${trail.source}")
+                        Log.d("MainNavGraph", "  - Distance: ${trail.distance}")
+                    } else {
+                        Log.e("MainNavGraph", "Trail non trouvé: $trailId")
+                        Log.e("MainNavGraph", "   IDs disponibles: ${trailCache.keys.toList()}")
+                    }
+
+                    navController.navigate("trail_detail_screen/$trailId")
+                } ,
+                onNavigateToCalendar = {
+                    navController.navigate(Screen.Calendar.route)
+                }
+            )
         }
+
         composable(Screen.Feed.route) {
             FeedScreen(
                 onNavigateToCreatePost = {
@@ -105,11 +147,24 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             route = "trail_detail_screen/{trailId}",
             arguments = listOf(navArgument("trailId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val trailId = backStackEntry.arguments?.getString("trailId") ?: return@composable
+            val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
+
+            Log.d("MainNavGraph", "TrailDetailScreen ouvert pour: $trailId")
+
+            val preloadedTrail = trailCache[trailId]
+
+            if (preloadedTrail != null) {
+                Log.d("MainNavGraph", "Trail récupéré du cache: ${preloadedTrail.name}")
+            } else {
+                Log.e("MainNavGraph", "Trail non trouvé dans le cache")
+            }
+
             TrailDetailScreen(
                 trailId = trailId,
-                onNavigateBack = { navController.popBackStack() },
-                // --- LOGIQUE POUR ALLER AU CALENDRIER ---
+                preloadedTrail = preloadedTrail,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
                 onPlanEventClick = {
                     navController.navigate(Screen.CreateEvent.createRoute(trailId))
                 }
