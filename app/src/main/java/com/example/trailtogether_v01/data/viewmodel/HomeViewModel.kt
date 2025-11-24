@@ -47,18 +47,24 @@ class HomeViewModel(
     private val _trailStats = MutableStateFlow(TrailStats(0, 0.0, 0))
     val trailStats: StateFlow<TrailStats> = _trailStats.asStateFlow()
 
-    // 🔥 SAUVEGARDE D'ÉTAT: Position et zoom de la carte
     private val _mapCenter = MutableStateFlow(
         savedStateHandle.get<Pair<Double, Double>>("mapCenter")?.let {
             GeoPoint(it.first, it.second)
-        } ?: GeoPoint(48.4284, -71.0598)
+        } ?: GeoPoint(48.4284, -71.0598) // Default pos
     )
     val mapCenter: StateFlow<GeoPoint> = _mapCenter.asStateFlow()
+
+    fun setInitialLocation(location: GeoPoint) {
+        _mapCenter.value = location
+        savedStateHandle["mapCenter"] = Pair(location.latitude, location.longitude)
+
+        // Charger les trails autour de cette position
+        loadMapTrails(location, 5000f)
+    }
 
     private val _mapZoom = MutableStateFlow(savedStateHandle.get<Double>("mapZoom") ?: 12.0)
     val mapZoom: StateFlow<Double> = _mapZoom.asStateFlow()
 
-    // 🔥 SAUVEGARDE: État du switch tracés
     private val _showTrailPath = MutableStateFlow(savedStateHandle.get<Boolean>("showTrailPath") ?: true)
     val showTrailPath: StateFlow<Boolean> = _showTrailPath.asStateFlow()
 

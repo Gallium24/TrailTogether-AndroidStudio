@@ -48,7 +48,7 @@ android {
 }
 
 dependencies {
-    // Dépendances de base - gardons les alias du catalogue de versions
+    // Dépendances de base
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -101,7 +101,10 @@ dependencies {
     implementation(libs.androidx.compose.animation.graphics)
     implementation(libs.firebase.crashlytics.buildtools)
 
-    // Dépendances de Test (inchangées)
+    // Google Play Services Location
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
+    // Dépendances de Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
