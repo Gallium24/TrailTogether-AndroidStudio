@@ -194,6 +194,74 @@ class FirestoreRepository {
         }
     }
 
+    //Notif
+    fun getNotifications(userId: String): Flow<List<Notification>> = callbackFlow {
+        val listener = firestore.collection("notifications")
+            .whereEqualTo("recipientId", userId)
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val notifications = snapshot?.documents?.mapNotNull {
+                    it.toObject<Notification>()?.copy(id = it.id)
+                } ?: emptyList()
+                trySend(notifications)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    suspend fun createNotification(notification: Notification) {
+        try {
+            firestore.collection("notifications")
+                .add(notification)
+                .await()
+            Log.d("FirestoreRepository", "Notification créée")
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur création notification", e)
+        }
+    }
+
+    suspend fun markNotificationAsRead(notificationId: String) {
+        try {
+            firestore.collection("notifications")
+                .document(notificationId)
+                .update("isRead", true)
+                .await()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur marquage notification", e)
+        }
+    }
+
+    suspend fun getUnreadNotificationCount(userId: String): Int {
+        return try {
+            val snapshot = firestore.collection("notifications")
+                .whereEqualTo("recipientId", userId)
+                .whereEqualTo("isRead", false)
+                .get()
+                .await()
+            snapshot.size()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur comptage notifications", e)
+            0
+        }
+    }
+
+    // Méthode helper pour récupérer l'auteur d'un post
+    suspend fun getPostAuthorId(postId: String): String? {
+        return try {
+            val snapshot = firestore.collection("posts")
+                .document(postId)
+                .get()
+                .await()
+            snapshot.getString("authorId")
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur récupération auteur", e)
+            null
+        }
+    }
+
     // --- Ajout pour la création d'événement ---
     suspend fun createEvent(event: Event): Result<String> {
         return try {

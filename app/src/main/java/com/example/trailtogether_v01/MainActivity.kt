@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
             repository.insertMockPosts()
         }*/
 
-
         setContent {
             TrailTogetherTheme {
                 Surface(

@@ -3,7 +3,10 @@ package com.example.trailtogether_v01.data.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trailtogether_v01.data.models.Comment
+import com.example.trailtogether_v01.data.models.Notification
+import com.example.trailtogether_v01.data.models.NotificationType
 import com.example.trailtogether_v01.data.repository.FirestoreRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class CommentsViewModel : ViewModel() {
     private val repository = FirestoreRepository()
-
+    private val auth = FirebaseAuth.getInstance()
     private val _comments = MutableStateFlow<List<Comment>>(emptyList())
     val comments: StateFlow<List<Comment>> = _comments.asStateFlow()
 
@@ -30,8 +33,22 @@ class CommentsViewModel : ViewModel() {
     fun sendComment(content: String) {
         if (content.isBlank() || currentPostId.isBlank()) return
 
+        val currentUser = auth.currentUser ?: return
         viewModelScope.launch {
             repository.addComment(currentPostId, content)
+
+            val postAuthorId = repository.getPostAuthorId(currentPostId)
+            if (postAuthorId != null && postAuthorId != currentUser.uid) {
+                val notification = Notification(
+                    recipientId = postAuthorId,
+                    senderId = currentUser.uid,
+                    senderName = currentUser.displayName ?: "Utilisateur",
+                    type = NotificationType.COMMENT,
+                    postId = currentPostId,
+                    content = "${currentUser.displayName ?: "Quelqu'un"} a commenté votre publication"
+                )
+                repository.createNotification(notification)
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
-
+import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScreen
 
 
 /**
@@ -92,9 +92,13 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 },
                 onNavigateToComments = { postId ->
                     navController.navigate(Screen.Comments.createRoute(postId))
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(Screen.Notifications.route)
                 }
             )
         }
+
         composable(Screen.Calendar.route) {
             CalendarScreen(
                 onNavigateToEventDetail = {
@@ -178,6 +182,17 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             CreateEventScreen(
                 trailId = trailId,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(
+                onNavigateToPost = { postId ->
+                    // Navigue vers le post concerné par la notification
+                    navController.navigate(Screen.Feed.route)
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }

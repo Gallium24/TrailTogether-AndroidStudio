@@ -7,15 +7,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.trailtogether_v01.data.viewmodel.NotificationsViewModel
 import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
@@ -24,16 +27,15 @@ data class BottomNavItem(
     val icon: ImageVector,
     val label: String
 )
-/**
- * BottomNavBar est une composante qui représente la barre de navigation inférieure de l'application.
- * @param navController NavController représente la navigation entre les différents écrans de l'application.
- * @param content Slot qui contient le contenu de l'écran actuel.
- */
+
 @Composable
 fun BottomNavBar(
     navController: NavController,
     content: @Composable (PaddingValues) -> Unit
 ) {
+    val notificationsViewModel: NotificationsViewModel = viewModel()
+    val unreadCount by notificationsViewModel.unreadCount.collectAsState()
+
     val items = listOf(
         BottomNavItem(Screen.Feed.route, Icons.Default.List, "Feed"),
         BottomNavItem(Screen.Home.route, Icons.Default.Home, "Accueil"),
@@ -50,8 +52,6 @@ fun BottomNavBar(
                 modifier = Modifier.height(110.dp)
             ) {
                 items.forEachIndexed { index, item ->
-                    // On considère l'item sélectionné si la route correspond
-                    // OU si on est sur l'Accueil et qu'on est dans une sous-route (Calendrier ou Détail)
                     val isSelected = currentRoute == item.route ||
                             (item.route == Screen.Home.route &&
                                     (currentRoute == Screen.Calendar.route || currentRoute?.startsWith("trail_detail") == true))
@@ -62,15 +62,10 @@ fun BottomNavBar(
                         selected = isSelected,
                         onClick = {
                             navController.navigate(item.route) {
-                                // Pop jusqu'au début du graphe pour éviter d'empiler les écrans
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
-
-                                // CORRECTION ICI :
-                                // On restaure l'état UNIQUEMENT si ce n'est pas l'écran Home.
-                                // Pour Home, on veut "reset" à la racine (la liste des trails) et ne pas revenir sur le Calendrier.
                                 restoreState = item.route != Screen.Home.route
                             }
                         },
@@ -94,11 +89,33 @@ fun BottomNavBar(
                                     )
                                 }
                             } else {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = item.label,
-                                    modifier = Modifier.size(28.dp)
-                                )
+                                if (item.route == Screen.Feed.route && unreadCount > 0) {
+                                    BadgedBox(
+                                        badge = {
+                                            Badge(
+                                                containerColor = Color.Red,
+                                                contentColor = Color.White
+                                            ) {
+                                                Text(
+                                                    text = if (unreadCount > 99) "99+" else "$unreadCount",
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = item.icon,
+                                            contentDescription = item.label,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+                                    }
+                                } else {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
                             }
                         },
                         label = { if (!isCenter) Text(item.label) },
@@ -111,7 +128,7 @@ fun BottomNavBar(
                 }
             }
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
         content(innerPadding)
     }
 }

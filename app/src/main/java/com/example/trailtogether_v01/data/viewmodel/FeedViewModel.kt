@@ -3,6 +3,8 @@ package com.example.trailtogether_v01.data.viewmodel
 import com.google.firebase.Timestamp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trailtogether_v01.data.models.Notification
+import com.example.trailtogether_v01.data.models.NotificationType
 import com.example.trailtogether_v01.data.models.Post
 import com.example.trailtogether_v01.data.repository.FirestoreRepository // Changé de MockRepository
 import com.google.firebase.Firebase
@@ -50,6 +52,22 @@ class FeedViewModel : ViewModel() {
             val currentPost = _posts.value.find { it.id == postId } ?: return@launch
             repository.toggleLikePost(postId, currentPost.isLiked)
             // Le snapshot listener mettra à jour _posts automatiquement
+
+            //envoie notif
+            if (!currentPost.isLiked && currentPost.authorId != auth.currentUser?.uid) {
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    val notification = Notification(
+                        recipientId = currentPost.authorId,
+                        senderId = currentUser.uid,
+                        senderName = currentUser.displayName ?: "Utilisateur",
+                        type = NotificationType.LIKE,
+                        postId = postId,
+                        content = "${currentUser.displayName ?: "Quelqu'un"} a aimé votre publication"
+                    )
+                    repository.createNotification(notification)
+                }
+            }
         }
     }
 
