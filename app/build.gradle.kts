@@ -57,7 +57,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
-    // Import du BOM Compose - C'est la meilleure pratique
+    // Kotlin Serialization pour parser JSON
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    // Import du BOM Compose
     implementation(platform(libs.androidx.compose.bom))
 
     // Dépendances Compose SANS version (le BOM s'en occupe)
@@ -65,15 +68,24 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3") // La version sera gérée par le BOM
-    implementation("androidx.compose.material:material") // Pour BottomNavigation M2
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material")
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.runtime:runtime-livedata")
 
-    // Import osmdroid pour map interactive
+    // Coil pour charger les images
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
+    // OSMDroid pour la carte OpenStreetMap
     implementation("org.osmdroid:osmdroid-wms:6.1.18")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // Ktor pour les appels réseau HTTP
+    implementation("io.ktor:ktor-client-android:2.3.12")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    implementation("io.ktor:ktor-client-core:2.3.5")
 
     // Import du BOM Firebase
     implementation(platform(libs.firebase.bom))
@@ -87,6 +99,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.compose.animation.graphics)
+    implementation(libs.firebase.crashlytics.buildtools)
 
     // Dépendances de Test (inchangées)
     testImplementation(libs.junit)
