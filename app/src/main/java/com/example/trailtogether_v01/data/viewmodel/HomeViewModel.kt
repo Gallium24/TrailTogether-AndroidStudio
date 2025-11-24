@@ -128,11 +128,11 @@ class HomeViewModel(
                         if (trails.isEmpty()) {
                             _errorMessage.value = "Aucun sentier trouvé dans ce rayon."
                         } else {
-                            Log.d("HomeViewModel", "✅ ${trails.size} sentiers")
+                            Log.d("HomeViewModel", "${trails.size} sentiers")
                         }
                     },
                     onFailure = { error ->
-                        Log.e("HomeViewModel", "❌ Erreur", error)
+                        Log.e("HomeViewModel", "Erreur", error)
                         _errorMessage.value = "Erreur: ${error.message}"
                     }
                 )

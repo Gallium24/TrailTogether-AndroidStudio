@@ -39,6 +39,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.ui.platform.LocalContext
 import com.example.trailtogether_v01.data.models.Difficulty
 import kotlinx.coroutines.launch
@@ -70,8 +71,12 @@ fun HomeScreen(
 
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
 
-    val mapTrails = remember(allTrails) {
-        allTrails.filter { it.source == "osm" && it.hasValidCoordinates() }
+    val mapTrails = remember(allTrails, selectedDifficulty) {
+        allTrails.filter {
+            it.source == "osm" &&
+                    it.hasValidCoordinates() &&
+                    (selectedDifficulty == null || it.difficulty == selectedDifficulty)
+        }
     }
 
     Column(
@@ -86,6 +91,7 @@ fun HomeScreen(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
+
         ) {
             Image(
                 painter = painterResource(id = R.drawable.trailtogether_logo),

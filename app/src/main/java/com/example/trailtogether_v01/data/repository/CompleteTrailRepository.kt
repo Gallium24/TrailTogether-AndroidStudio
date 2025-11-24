@@ -8,6 +8,8 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.time.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -87,9 +89,9 @@ class CompleteTrailRepository {
             return false
         }
 
-        // Rejeter les chemins trop courts (< 500m)
+        // Rejeter les chemins trop courts (< 800m)
         val lengthKm = calculateDistance(trail.pathCoordinates)
-        if (lengthKm < 0.5) {
+        if (lengthKm < 0.8) {
             return false
         }
 
@@ -101,7 +103,6 @@ class CompleteTrailRepository {
         center: GeoPoint,
         radiusMeters: Float
     ): List<RawOverpassTrail> {
-        // 🔥 OPTIMISATION: Requête plus stricte
         val query = """
             [out:json][timeout:15];
             (
@@ -188,7 +189,6 @@ class CompleteTrailRepository {
         try {
             val lengthKm = calculateDistance(rawTrail.pathCoordinates)
 
-            // 🔥 OPTIMISATION: Réduire les points pour l'élévation (10 au lieu de 50)
             val sampledPoints = samplePoints(rawTrail.pathCoordinates, maxPoints = 10)
 
             val elevations = getElevations(sampledPoints)
@@ -203,10 +203,17 @@ class CompleteTrailRepository {
             val difficulty = calculateDifficulty(lengthKm, gain, rawTrail.sacScale)
             val duration = estimateDuration(lengthKm, gain)
 
+            val startPoint = rawTrail.pathCoordinates.first()
+            val realLocation = GeocodingService.getAddressFromCoordinates(
+                startPoint.latitude,
+                startPoint.longitude
+            )
+            delay(1100)
+
             return Trail(
                 id = "osm_${rawTrail.id}",
                 name = rawTrail.name,
-                location = "OpenStreetMap",
+                location = realLocation,
                 distance = "${String.format("%.1f", lengthKm)} km",
                 duration = duration,
                 difficulty = difficulty,
@@ -347,6 +354,7 @@ class CompleteTrailRepository {
      */
     fun clearCache() {
         trailCache.clear()
+        GeocodingCache.clear()
         Log.d("CompleteTrailRepo", "🗑️ Cache nettoyé")
     }
 }
