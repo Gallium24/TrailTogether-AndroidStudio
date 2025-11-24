@@ -10,12 +10,14 @@ import androidx.navigation.navArgument
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
 import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
 import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
+import com.example.trailtogether_v01.ui.screens.feed.CommentsScreen
 import com.example.trailtogether_v01.ui.screens.home.HomeScreen
 import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
+
 
 
 /**
@@ -45,6 +47,9 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 },
                 onNavigateToUserProfile = { userId ->
                     navController.navigate(Screen.UserProfile.createRoute(userId))
+                },
+                onNavigateToComments = { postId ->
+                    navController.navigate(Screen.Comments.createRoute(postId))
                 }
             )
         }
@@ -73,6 +78,17 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 onNavigateBack = { navController.popBackStack() }
             )
         }
+        composable(
+            route = Screen.Comments.route,
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: return@composable
+            CommentsScreen(
+                postId = postId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
 
         // --- Écrans additionnels ---
         composable(Screen.EditProfile.route) {

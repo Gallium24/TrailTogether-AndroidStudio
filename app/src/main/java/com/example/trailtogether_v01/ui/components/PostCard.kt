@@ -28,7 +28,8 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 fun PostCard(
     post: Post,
     onLikeClick: () -> Unit,
-    onUserClick: (String) -> Unit = {}
+    onUserClick: (String) -> Unit = {},
+    onCommentClick: () -> Unit = {} // <-- NOUVEAU
 ) {
     Column(
         modifier = Modifier
@@ -126,7 +127,10 @@ fun PostCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("${post.likesCount} likes", fontSize = 14.sp)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onCommentClick() } // <-- ACTION ICI
+                ) {
                     Icon(
                         Icons.Default.ChatBubbleOutline,
                         contentDescription = "Comments",

@@ -25,6 +25,9 @@ sealed class Screen(val route: String) {
     object UserProfile : Screen("user_profile/{userId}") {
         fun createRoute(userId: String) = "user_profile/$userId"
     }
+    object Comments : Screen("comments_screen/{postId}") {
+        fun createRoute(postId: String) = "comments_screen/$postId"
+    }
 
     // Écrans accessibles depuis l'onglet Home
     object TrailDetail : Screen("trail_detail_screen/{trailId}") {

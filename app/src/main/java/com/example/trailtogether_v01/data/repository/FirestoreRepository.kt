@@ -294,6 +294,54 @@ class FirestoreRepository {
             }
         }.await()
     }
+
+    // --- Commentaires ---
+
+    // Récupère les commentaires d'un post en temps réel
+    fun getComments(postId: String): Flow<List<Comment>> = callbackFlow {
+        val listener = firestore.collection("posts").document(postId)
+            .collection("comments")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val comments = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject<Comment>()?.copy(id = doc.id)
+                } ?: emptyList()
+                trySend(comments)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    // Ajoute un commentaire et incrémente le compteur
+    suspend fun addComment(postId: String, content: String) {
+        val currentUser = auth.currentUser ?: return
+
+        val comment = Comment(
+            postId = postId,
+            authorId = currentUser.uid,
+            authorName = currentUser.displayName ?: "Utilisateur",
+            content = content,
+            timestamp = Timestamp.now()
+        )
+
+        val postRef = firestore.collection("posts").document(postId)
+
+        try {
+            firestore.runTransaction { transaction ->
+                // 1. Créer le doc dans la sous-collection 'comments'
+                val newCommentRef = postRef.collection("comments").document()
+                transaction.set(newCommentRef, comment)
+
+                // 2. Incrémenter le compteur sur le post parent
+                transaction.update(postRef, "commentsCount", FieldValue.increment(1))
+            }.await()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur lors de l'ajout du commentaire", e)
+        }
+    }
 /*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(
