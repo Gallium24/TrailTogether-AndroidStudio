@@ -33,6 +33,7 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
     val user by profileViewModel.user.collectAsState()
@@ -49,7 +50,7 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { onNavigateToSettings }) {
                 Icon(Icons.Default.Settings, contentDescription = "Paramètres")
             }
         }

@@ -43,9 +43,16 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.trailtogether_v01.data.models.Difficulty
 import kotlinx.coroutines.launch
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.createBitmap
+import com.example.trailtogether_v01.data.viewmodel.SettingsViewModel
+import com.example.trailtogether_v01.utils.MapUtils.OpenTopoMapSource
+
 
 /**
  * HomeScreen est la composante de l'écran d'accueil.
@@ -57,7 +64,9 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     onNavigateToTrailDetail: (String) -> Unit,
     onNavigateToCalendar: () -> Unit,
-    homeViewModel: HomeViewModel = viewModel()
+    onNavigateToSettings: () -> Unit,
+    homeViewModel: HomeViewModel = viewModel(),
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -74,11 +83,30 @@ fun HomeScreen(
     val savedMapZoom by homeViewModel.mapZoom.collectAsState()
     val showTrailPath by homeViewModel.showTrailPath.collectAsState()
 
+    val settingsState by settingsViewModel.uiState.collectAsState()
+
     val context = LocalContext.current
     var showRadiusDialog by remember { mutableStateOf(false) }
-    var radiusMeters by remember { mutableStateOf(5000f) }
+    var radiusMeters by remember { mutableFloatStateOf(settingsState.defaultRadius * 1000) }
 
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+
+    LaunchedEffect(settingsState.defaultRadius) {
+        radiusMeters = settingsState.defaultRadius * 1000
+        homeViewModel.loadMapTrails(savedMapCenter, radiusMeters)
+    }
+
+
+    LaunchedEffect(settingsState.mapStyle) {
+        mapViewRef?.let { map ->
+            if (settingsState.mapStyle == "OpenTopoMap") {
+                map.setTileSource(OpenTopoMapSource)
+            } else {
+                map.setTileSource(TileSourceFactory.MAPNIK)
+            }
+            map.invalidate() // Force refresh
+        }
+    }
 
     val mapTrails = remember(allTrails, selectedDifficulty) {
         allTrails.filter {
@@ -117,10 +145,15 @@ fun HomeScreen(
                 }
                 IconButton(onClick = { showRadiusDialog = true }) {
                     Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                        Text("${(radiusMeters / 1000).toInt()}km", fontSize = 10.sp)
+                        val radiusText = if (settingsState.useImperialUnits) {
+                            "${(radiusMeters * 0.000621371).toInt()} mi"
+                        } else {
+                            "${(radiusMeters / 1000).toInt()} km"
+                        }
+                        Text(radiusText, fontSize = 10.sp)
                     }
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = onNavigateToSettings) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings")
                 }
             }
@@ -436,7 +469,7 @@ private fun createMarkerIcon(
     val size = if (isSelected) 70 else 50 // Plus gros si sélectionné
     val height = if (isSelected) 90 else 70
 
-    val bitmap = Bitmap.createBitmap(size, height, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(size, height)
     val canvas = Canvas(bitmap)
     val paint = Paint().apply {
         color = getDifficultyColor(difficulty)
@@ -461,5 +494,15 @@ private fun createMarkerIcon(
     paint.color = android.graphics.Color.WHITE
     canvas.drawCircle(centerX, centerX, radius, paint)
 
-    return BitmapDrawable(context.resources, bitmap)
+    return bitmap.toDrawable(context.resources)
+}
+
+fun formatDistance(meters: Float, useImperial: Boolean): String {
+    return if (useImperial) {
+        val miles = meters * 0.000621371
+        "%.1f mi".format(miles)
+    } else {
+        val km = meters / 1000
+        "%.1f km".format(km)
+    }
 }

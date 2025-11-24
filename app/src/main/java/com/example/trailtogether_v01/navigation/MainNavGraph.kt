@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
+import com.example.trailtogether_v01.data.viewmodel.SettingsViewModel
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
 import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
 import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
@@ -28,6 +29,7 @@ import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
 import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScreen
+import com.example.trailtogether_v01.ui.screens.settings.SettingsScreen
 
 
 /**
@@ -37,6 +39,8 @@ import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScree
 @Composable
 fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout: () -> Unit) {
     val homeViewModel: HomeViewModel = viewModel()
+    val settingsViewModel: SettingsViewModel = viewModel()
+
     val trailCache = remember { mutableMapOf<String, Trail>() }
 
     val allTrails by homeViewModel.allTrails.collectAsState()
@@ -78,7 +82,11 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 } ,
                 onNavigateToCalendar = {
                     navController.navigate(Screen.Calendar.route)
-                }
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Setting.route)
+                },
+                settingsViewModel = settingsViewModel
             )
         }
 
@@ -112,6 +120,9 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 onNavigateToEditProfile = {
                     navController.navigate(Screen.EditProfile.route)
                 },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Setting.route)
+                }
             )
         }
         composable(
@@ -132,6 +143,17 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             CommentsScreen(
                 postId = postId,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Setting.route) {
+            SettingsScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onSignOut = {
+                    // We use the onLogout passed to MainNavGraph
+                    onLogout()
+                }
             )
         }
 
