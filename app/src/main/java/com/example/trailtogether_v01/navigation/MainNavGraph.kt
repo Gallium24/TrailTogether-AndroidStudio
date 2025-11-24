@@ -14,6 +14,7 @@ import com.example.trailtogether_v01.ui.screens.home.HomeScreen
 import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
+import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
 
 
@@ -41,6 +42,9 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             FeedScreen(
                 onNavigateToCreatePost = {
                     navController.navigate(Screen.CreatePost.route)
+                },
+                onNavigateToUserProfile = { userId ->
+                    navController.navigate(Screen.UserProfile.createRoute(userId))
                 }
             )
         }
@@ -57,6 +61,16 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 onNavigateToEditProfile = {
                     navController.navigate(Screen.EditProfile.route)
                 },
+            )
+        }
+        composable(
+            route = Screen.UserProfile.route,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: return@composable
+            UserProfileScreen(
+                userId = userId,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

@@ -27,7 +27,8 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 @Composable
 fun PostCard(
     post: Post,
-    onLikeClick: () -> Unit
+    onLikeClick: () -> Unit,
+    onUserClick: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -44,7 +45,8 @@ fun PostCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.clickable { onUserClick(post.authorId) }
             ) {
                 Box(
                     modifier = Modifier

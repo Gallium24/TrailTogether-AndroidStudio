@@ -25,6 +25,7 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 @Composable
 fun FeedScreen(
     onNavigateToCreatePost: () -> Unit,
+    onNavigateToUserProfile: (String) -> Unit,
     feedViewModel: FeedViewModel = viewModel()
 ) {
     val posts by feedViewModel.posts.collectAsState()
@@ -72,7 +73,8 @@ fun FeedScreen(
                 items(posts) { post ->
                     PostCard(
                         post = post,
-                        onLikeClick = { feedViewModel.likePost(post.id) }
+                        onLikeClick = { feedViewModel.likePost(post.id) },
+                        onUserClick = { userId -> onNavigateToUserProfile(userId) }
                     )
                 }
             }

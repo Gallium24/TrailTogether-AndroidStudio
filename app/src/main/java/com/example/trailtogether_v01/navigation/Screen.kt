@@ -22,6 +22,9 @@ sealed class Screen(val route: String) {
     object CreateEvent : Screen("create_event_screen/{trailId}") {
         fun createRoute(trailId: String) = "create_event_screen/$trailId"
     }
+    object UserProfile : Screen("user_profile/{userId}") {
+        fun createRoute(userId: String) = "user_profile/$userId"
+    }
 
     // Écrans accessibles depuis l'onglet Home
     object TrailDetail : Screen("trail_detail_screen/{trailId}") {

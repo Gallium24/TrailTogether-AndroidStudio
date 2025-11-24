@@ -211,6 +211,89 @@ class FirestoreRepository {
             Result.failure(e)
         }
     }
+
+    // --- Gestion des Profils Publics & Abonnements ---
+
+    fun getUserById(userId: String): Flow<User?> = callbackFlow {
+        val listener = firestore.collection("users").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                trySend(snapshot?.toObject<User>())
+            }
+        awaitClose { listener.remove() }
+    }
+
+    fun getPostsByAuthor(authorId: String): Flow<List<Post>> = callbackFlow {
+        val currentUserId = auth.currentUser?.uid
+        val listener = firestore.collection("posts")
+            .whereEqualTo("authorId", authorId)
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val posts = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject<Post>()?.let { post ->
+                        post.copy(
+                            id = doc.id,
+                            isLiked = (doc["likedBy"] as? List<*>)?.contains(currentUserId) ?: false
+                        )
+                    }
+                } ?: emptyList()
+                trySend(posts)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    fun isFollowing(targetUserId: String): Flow<Boolean> = callbackFlow {
+        val currentUserId = auth.currentUser?.uid ?: run {
+            trySend(false)
+            close()
+            return@callbackFlow
+        }
+
+        // On vérifie l'existence d'un document dans la sous-collection "following"
+        val listener = firestore.collection("users").document(currentUserId)
+            .collection("following").document(targetUserId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(false)
+                    return@addSnapshotListener
+                }
+                trySend(snapshot != null && snapshot.exists())
+            }
+        awaitClose { listener.remove() }
+    }
+
+    suspend fun toggleFollow(targetUserId: String, isFollowing: Boolean) {
+        val currentUserId = auth.currentUser?.uid ?: return
+
+        val currentUserRef = firestore.collection("users").document(currentUserId)
+        val targetUserRef = firestore.collection("users").document(targetUserId)
+        val followingRef = currentUserRef.collection("following").document(targetUserId)
+        val followerRef = targetUserRef.collection("followers").document(currentUserId)
+
+        firestore.runTransaction { transaction ->
+            if (isFollowing) {
+                // Désabonnement
+                transaction.delete(followingRef)
+                transaction.delete(followerRef)
+                transaction.update(currentUserRef, "followingCount", FieldValue.increment(-1))
+                transaction.update(targetUserRef, "followersCount", FieldValue.increment(-1))
+            } else {
+                // Abonnement
+                val data = hashMapOf("timestamp" to Timestamp.now())
+                transaction.set(followingRef, data)
+                transaction.set(followerRef, data)
+                transaction.update(currentUserRef, "followingCount", FieldValue.increment(1))
+                transaction.update(targetUserRef, "followersCount", FieldValue.increment(1))
+            }
+        }.await()
+    }
 /*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(
