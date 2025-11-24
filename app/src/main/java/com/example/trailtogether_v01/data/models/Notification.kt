@@ -1,6 +1,7 @@
 package com.example.trailtogether_v01.data.models
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.PropertyName
 
 data class Notification(
     val id: String = "",
@@ -10,7 +11,9 @@ data class Notification(
     val type: NotificationType = NotificationType.LIKE,
     val postId: String = "",
     val content: String = "", // Texte de la notification
-    val isRead: Boolean = false,
+    @get:PropertyName("read")
+    @set:PropertyName("read")
+    var isRead: Boolean = false,
     val timestamp: Timestamp = Timestamp.now()
 )
 

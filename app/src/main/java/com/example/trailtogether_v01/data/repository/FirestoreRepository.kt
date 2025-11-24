@@ -214,8 +214,12 @@ class FirestoreRepository {
 
     suspend fun createNotification(notification: Notification) {
         try {
+            val notificationId = firestore.collection("notifications").document().id
+            val notificationWithId = notification.copy(id = notificationId)
+
             firestore.collection("notifications")
-                .add(notification)
+                .document(notificationId)
+                .set(notificationWithId)
                 .await()
             Log.d("FirestoreRepository", "Notification créée")
         } catch (e: Exception) {
@@ -224,10 +228,13 @@ class FirestoreRepository {
     }
 
     suspend fun markNotificationAsRead(notificationId: String) {
+        if (notificationId.isBlank()) {
+            return
+        }
         try {
             firestore.collection("notifications")
                 .document(notificationId)
-                .update("isRead", true)
+                .update("read", true)
                 .await()
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Erreur marquage notification", e)
