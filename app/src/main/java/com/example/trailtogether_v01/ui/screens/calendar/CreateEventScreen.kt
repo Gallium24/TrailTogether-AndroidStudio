@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.trailtogether_v01.data.models.Event
+import com.example.trailtogether_v01.data.models.Trail // Import nécessaire
 import com.example.trailtogether_v01.data.repository.FirestoreRepository
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 import com.google.firebase.Firebase
@@ -26,12 +27,12 @@ import java.util.Calendar
 fun CreateEventScreen(
     trailId: String,
     trailName: String,
+    trail: Trail?,
     onNavigateBack: () -> Unit
 ) {
     val repository = FirestoreRepository()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
     val auth = Firebase.auth
 
     // États du formulaire
@@ -42,27 +43,21 @@ fun CreateEventScreen(
 
     val calendar = Calendar.getInstance()
 
-    // Date Picker
+    // ... (DatePicker et TimePicker inchangés) ...
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-            // Format YYYY-MM-DD
             selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
         },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-    // Time Picker
     val timePickerDialog = TimePickerDialog(
         context,
         { _, hourOfDay, minute ->
             selectedTime = String.format("%02d:%02d", hourOfDay, minute)
         },
-        calendar.get(Calendar.HOUR_OF_DAY),
-        calendar.get(Calendar.MINUTE),
-        true
+        calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true
     )
 
     Scaffold(
@@ -84,44 +79,32 @@ fun CreateEventScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // ... (Champs Date, Time, Description inchangés) ...
             Text("Quand souhaitez-vous partir ?", style = MaterialTheme.typography.titleMedium)
 
-            // Champ Date
             OutlinedTextField(
                 value = selectedDate,
                 onValueChange = {},
                 label = { Text("Date") },
                 readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = { datePickerDialog.show() }) {
-                        Icon(Icons.Default.CalendarToday, contentDescription = "Choisir date")
-                    }
-                },
+                trailingIcon = { IconButton(onClick = { datePickerDialog.show() }) { Icon(Icons.Default.CalendarToday, "Date") } },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Champ Heure
             OutlinedTextField(
                 value = selectedTime,
                 onValueChange = {},
-                label = { Text("Heure de départ") },
+                label = { Text("Heure") },
                 readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = { timePickerDialog.show() }) {
-                        Icon(Icons.Default.AccessTime, contentDescription = "Choisir heure")
-                    }
-                },
+                trailingIcon = { IconButton(onClick = { timePickerDialog.show() }) { Icon(Icons.Default.AccessTime, "Heure") } },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Champ Description
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Message aux participants (lieu de rdv, etc.)") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
+                label = { Text("Message aux participants") },
+                modifier = Modifier.fillMaxWidth().height(120.dp),
                 maxLines = 5
             )
 
@@ -133,6 +116,13 @@ fun CreateEventScreen(
                         isSubmitting = true
                         scope.launch {
                             val user = auth.currentUser
+
+                            // 1. Si on a le trail (OSM), on le sauvegarde dans Firestore pour que tout le monde puisse voir la carte
+                            if (trail != null) {
+                                repository.saveTrail(trail)
+                            }
+
+                            // 2. On crée l'événement avec les infos complètes (distance, durée)
                             val newEvent = Event(
                                 trailId = trailId,
                                 trailName = trailName,
@@ -141,6 +131,9 @@ fun CreateEventScreen(
                                 date = selectedDate,
                                 time = selectedTime,
                                 description = description,
+                                distance = trail?.distance ?: "",
+                                duration = trail?.duration ?: "",
+                                difficulty = trail?.difficulty ?: com.example.trailtogether_v01.data.models.Difficulty.EASY,
                                 participantsCount = 1,
                                 maxParticipants = 10
                             )
@@ -150,9 +143,7 @@ fun CreateEventScreen(
                         }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 enabled = !isSubmitting && selectedDate.isNotBlank() && selectedTime.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = TrailGreen)
             ) {

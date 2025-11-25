@@ -23,6 +23,7 @@ import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 @Composable
 fun HistoryScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToEventDetail: (String) -> Unit,
     viewModel: HistoryViewModel = viewModel()
 ) {
     val events by viewModel.userEvents.collectAsState()
@@ -60,8 +61,10 @@ fun HistoryScreen(
                 }
             } else {
                 items(events) { event ->
-                    // On réutilise EventCard, ou on peut faire une carte spécifique "HistoryItem"
-                    EventCard(event = event, onClick = { /* Optionnel: aller aux détails */ })
+                    EventCard(
+                        event = event,
+                        onClick = { onNavigateToEventDetail(event.id) } // <--- Connexion
+                    )
                 }
             }
         }

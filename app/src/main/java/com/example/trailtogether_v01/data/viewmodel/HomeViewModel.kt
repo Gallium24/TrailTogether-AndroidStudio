@@ -99,10 +99,21 @@ class HomeViewModel(
         val firestoreTrails = _firestoreTrails.value
         val osmTrails = _osmTrails.value
 
-        _allTrails.value = firestoreTrails + osmTrails
+        // On récupère tous les IDs qui existent déjà dans Firestore
+        val firestoreIds = firestoreTrails.map { it.id }.toSet()
+
+        // On ne garde que les sentiers OSM qui NE SONT PAS déjà dans Firestore
+        val uniqueOsmTrails = osmTrails.filter { trail ->
+            !firestoreIds.contains(trail.id)
+        }
+
+        // On combine : Les trails Firestore (prioritaires) + Les trails OSM restants
+        _allTrails.value = firestoreTrails + uniqueOsmTrails
+
         updateStats()
 
-        Log.d("HomeViewModel", "📊 Total: ${_allTrails.value.size} trails")
+        Log.d("HomeViewModel", "📊 Total: ${_allTrails.value.size} trails " +
+                "(Firestore: ${firestoreTrails.size}, OSM filtrés: ${uniqueOsmTrails.size})")
     }
 
     private fun updateStats() {

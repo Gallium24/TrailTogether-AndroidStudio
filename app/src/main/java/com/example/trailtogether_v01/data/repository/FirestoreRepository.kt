@@ -85,6 +85,19 @@ class FirestoreRepository {
         awaitClose { listener.remove() }
     }
 
+    // Sauvegarder un trail (utile pour persister les trails OSM)
+    suspend fun saveTrail(trail: Trail) {
+        try {
+            // On utilise set avec merge pour ne pas écraser s'il existe déjà
+            firestore.collection("trails").document(trail.id)
+                .set(trail, com.google.firebase.firestore.SetOptions.merge())
+                .await()
+            Log.d("FirestoreRepository", "Trail sauvegardé: ${trail.name}")
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur sauvegarde trail", e)
+        }
+    }
+
     // Events
     fun getEvents(): Flow<List<Event>> = callbackFlow {
         val listener = firestore.collection("events")
@@ -269,23 +282,7 @@ class FirestoreRepository {
         }
     }
 
-    // --- Ajout pour la création d'événement ---
-    suspend fun createEvent(event: Event): Result<String> {
-        return try {
-            // On laisse Firestore générer l'ID si celui de l'event est vide
-            val docRef = if (event.id.isBlank()) {
-                firestore.collection("events").document()
-            } else {
-                firestore.collection("events").document(event.id)
-            }
 
-            val finalEvent = event.copy(id = docRef.id)
-            docRef.set(finalEvent).await()
-            Result.success(docRef.id)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
     // --- Gestion des Profils Publics & Abonnements ---
 
@@ -420,6 +417,24 @@ class FirestoreRepository {
 
     // --- Historique & Events Utilisateur ---
 
+    // --- Ajout pour la création d'événement ---
+    suspend fun createEvent(event: Event): Result<String> {
+        return try {
+            // On laisse Firestore générer l'ID si celui de l'event est vide
+            val docRef = if (event.id.isBlank()) {
+                firestore.collection("events").document()
+            } else {
+                firestore.collection("events").document(event.id)
+            }
+
+            val finalEvent = event.copy(id = docRef.id)
+            docRef.set(finalEvent).await()
+            Result.success(docRef.id)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     // Récupère tous les événements organisés par un utilisateur spécifique
     fun getUserEvents(userId: String): Flow<List<Event>> = callbackFlow {
         val listener = firestore.collection("events")
@@ -433,6 +448,29 @@ class FirestoreRepository {
                 trySend(events)
             }
         awaitClose { listener.remove() }
+    }
+
+    // Récupérer un événement par son ID
+    fun getEventById(eventId: String): Flow<Event?> = callbackFlow {
+        val listener = firestore.collection("events").document(eventId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val event = snapshot?.toObject<Event>(Event::class.java)
+                trySend(event)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    // Supprimer un événement
+    suspend fun deleteEvent(eventId: String) {
+        try {
+            firestore.collection("events").document(eventId).delete().await()
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "Erreur lors de la suppression de l'événement", e)
+        }
     }
 /*
     suspend fun insertMockTrails() {

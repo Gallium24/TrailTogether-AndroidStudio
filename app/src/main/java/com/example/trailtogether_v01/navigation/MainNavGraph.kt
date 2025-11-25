@@ -18,6 +18,7 @@ import androidx.navigation.navArgument
 import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
+import com.example.trailtogether_v01.ui.screens.calendar.EventDetailScreen
 import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
 import com.example.trailtogether_v01.ui.screens.feed.FeedScreen
 import com.example.trailtogether_v01.ui.screens.feed.CommentsScreen
@@ -102,8 +103,8 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
 
         composable(Screen.Calendar.route) {
             CalendarScreen(
-                onNavigateToEventDetail = {
-                    navController.navigate(Screen.Calendar.route)
+                onNavigateToEventDetail = { eventId ->
+                    navController.navigate(Screen.EventDetail.createRoute(eventId))
                 }
             )
         }
@@ -136,6 +137,20 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
         }
         composable(Screen.History.route) {
             HistoryScreen(
+                onNavigateBack = { navController.popBackStack() },
+                // Ajoutez un callback dans HistoryScreen pour naviguer
+                onNavigateToEventDetail = { eventId ->
+                    navController.navigate(Screen.EventDetail.createRoute(eventId))
+                }
+            )
+        }
+        composable(
+            route = Screen.EventDetail.route,
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
+            EventDetailScreen(
+                eventId = eventId,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -190,9 +205,13 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
             val trailName = backStackEntry.arguments?.getString("trailName") ?: "Randonnée"
 
+            // On récupère le trail complet depuis le cache local pour le passer à l'écran
+            val cachedTrail = trailCache[trailId]
+
             CreateEventScreen(
                 trailId = trailId,
                 trailName = trailName,
+                trail = cachedTrail,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

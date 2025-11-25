@@ -29,6 +29,9 @@ sealed class Screen(val route: String) {
     object Comments : Screen("comments_screen/{postId}") {
         fun createRoute(postId: String) = "comments_screen/$postId"
     }
+    object EventDetail : Screen("event_detail_screen/{eventId}") {
+        fun createRoute(eventId: String) = "event_detail_screen/$eventId"
+    }
 
     // Écrans accessibles depuis l'onglet Home
     object TrailDetail : Screen("trail_detail_screen/{trailId}") {
