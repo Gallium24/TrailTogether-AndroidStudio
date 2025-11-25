@@ -9,6 +9,13 @@ android {
     namespace = "com.example.trailtogether_v01"
     compileSdk = 36
 
+    packaging {
+        resources {
+            pickFirst("META-INF/LICENSE.md")
+            pickFirst("META-INF/NOTICE.md")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.trailtogether_v01"
         minSdk = 26
@@ -80,6 +87,13 @@ dependencies {
     // OSMDroid pour la carte OpenStreetMap
     implementation("org.osmdroid:osmdroid-wms:6.1.18")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // WorkManager pour les tâches de fond
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // JavaMail pour envoyer des mails sans interaction utilisateur
+    implementation("com.sun.mail:android-mail:1.6.7")
+    implementation("com.sun.mail:android-activation:1.6.7")
 
     // Ktor pour les appels réseau HTTP
     implementation("io.ktor:ktor-client-android:2.3.12")

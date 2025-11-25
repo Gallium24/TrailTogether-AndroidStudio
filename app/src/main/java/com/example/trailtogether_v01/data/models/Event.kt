@@ -17,5 +17,7 @@ data class Event(
     val participantsCount: Int = 0,
     val maxParticipants: Int = 20,
     val description: String = "",
-    val meetingPoint: String = ""
+    val meetingPoint: String = "",
+    val status: String = "PLANNED", // "PLANNED", "STARTED", "SAFE", "COMPLETED"
+    val alertScheduled: Boolean = false
 )

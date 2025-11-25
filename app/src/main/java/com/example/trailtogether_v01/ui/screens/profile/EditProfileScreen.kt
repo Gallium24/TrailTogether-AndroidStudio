@@ -20,6 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trailtogether_v01.data.viewmodel.ProfileViewModel
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Email
+
 
 /**
  * EditProfileScreen est la composante de l'écran de modification du profil.
@@ -120,24 +127,25 @@ fun EditProfileScreen(
                 // --- Information contact d'urgence ---
                 Divider()
                 Row(
-                    verticalAlignment = Alignment.CenterVertically, // Aligne l'icône et le texte sur la même ligne
-                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Ajoute un espace de 8.dp entre eux
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Contact d'urgence",
+                        text = "Sécurité",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Icon(
-                        imageVector = Icons.Default.Phone,
+                        imageVector = Icons.Outlined.Security, // ou Shield
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error // Couleur rouge
+                        tint = Color(0xFF40A829)
                     )
                 }
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
                     )
                 ) {
                     Row(
@@ -146,13 +154,14 @@ fun EditProfileScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            Icons.Default.Warning,
+                            Icons.Outlined.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Ce contact sera alerté si vous ne signalez pas la fin de votre randonnée dans les 24h suivant l'heure prévue.",
-                            fontSize = 14.sp
+                            text = "L'email ci-dessous recevra une alerte si vous ne signalez pas votre retour 24h après le début d'une sortie.",
+                            fontSize = 13.sp,
+                            lineHeight = 18.sp
                         )
                     }
                 }
@@ -160,19 +169,13 @@ fun EditProfileScreen(
                 OutlinedTextField(
                     value = emergencyContact,
                     onValueChange = { emergencyContact = it },
-                    label = { Text("Nom du contact") },
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                    label = { Text("Email du contact d'urgence") }, // Label clair
+                    placeholder = { Text("ex: proche@email.com") },
+                    leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null, tint = Color(0xFF40A829)) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                OutlinedTextField(
-                    value = emergencyPhone,
-                    onValueChange = { emergencyPhone = it },
-                    label = { Text("Numéro de téléphone") },
-                    leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), // Clavier Email
+                    singleLine = true
                 )
             }
         }

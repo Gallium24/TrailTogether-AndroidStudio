@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.trailtogether_v01.data.models.Event
-import com.example.trailtogether_v01.data.models.Trail // Import nécessaire
+import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.data.repository.FirestoreRepository
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 import com.google.firebase.Firebase

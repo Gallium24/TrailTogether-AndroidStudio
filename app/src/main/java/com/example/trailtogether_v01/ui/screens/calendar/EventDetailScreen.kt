@@ -29,6 +29,12 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import java.util.concurrent.TimeUnit
+import com.example.trailtogether_v01.workers.EmergencyWorker
+import android.widget.Toast
 
 @Composable
 fun EventDetailScreen(
@@ -44,6 +50,9 @@ fun EventDetailScreen(
     val associatedTrail by viewModel.associatedTrail.collectAsState()
     val isFuture by viewModel.isEventInFuture.collectAsState()
     val context = LocalContext.current
+
+    // Récupérer l'email d'urgence depuis le ViewModel
+    val emergencyEmail by viewModel.currentUserEmergencyEmail.collectAsState()
 
     // Confirmation dialog state
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -248,23 +257,95 @@ fun EventDetailScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // --- BOUTON ACTION ---
-                Button(
-                    onClick = { showDeleteDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                // --- ZONE D'ACTIONS ---
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        imageVector = if (isFuture) Icons.Default.Cancel else Icons.Default.Delete,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (isFuture) "Annuler la sortie" else "Supprimer de l'historique")
+
+                    // BOUTON 1 : PARTIR MAINTENANT (Visible si futur/aujourd'hui et pas encore parti/fini)
+                    if (isFuture && event?.status == "PLANNED") { // On suppose que le statut par défaut est "PLANNED"
+                        Button(
+                            onClick = {
+                                if (emergencyEmail.isNullOrBlank()) {
+                                    Toast.makeText(
+                                        context,
+                                        "Veuillez configurer un email d'urgence dans votre profil",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    // 1. Lancer le Worker de 24h
+                                    val data = workDataOf(
+                                        "eventId" to eventId,
+                                        "recipientEmail" to emergencyEmail
+                                    )
+
+                                    val alertWork = OneTimeWorkRequestBuilder<EmergencyWorker>()
+                                        .setInitialDelay(30, TimeUnit.SECONDS)
+                                        .setInputData(data)
+                                        .addTag(eventId)
+                                        .build()
+
+                                    WorkManager.getInstance(context).enqueue(alertWork)
+
+                                    // 2. Mettre à jour le statut dans Firestore
+                                    viewModel.startHike()
+
+                                    Toast.makeText(
+                                        context,
+                                        "Bonne rando ! Sécurité activée (24h)",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = TrailGreen),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.DirectionsRun, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Partir maintenant")
+                        }
+                    }
+
+                    // BOUTON 2 : JE SUIS RENTRÉ (Visible si la rando a commencé)
+                    if (event?.status == "STARTED") {
+                        Button(
+                            onClick = {
+                                viewModel.markAsSafe(context)
+                                Toast.makeText(context, "Bon retour ! Alerte de sécurité désactivée.", Toast.LENGTH_LONG).show() },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Vert vif
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.CheckCircle, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Je suis bien rentré")
+                        }
+                    }
+
+                    // BOUTON 3 : ANNULER / SUPPRIMER
+                    OutlinedButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.error
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isFuture) Icons.Default.Cancel else Icons.Default.Delete,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isFuture) "Annuler la sortie" else "Supprimer de l'historique")
+                    }
                 }
             }
         }
