@@ -43,7 +43,7 @@ fun TrailDetailScreen(
     trailId: String,
     preloadedTrail: Trail? = null,
     onNavigateBack: () -> Unit,
-    onPlanEventClick: () -> Unit,
+    onPlanEventClick: (String) -> Unit,
     detailViewModel: TrailDetailViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -321,7 +321,7 @@ fun TrailDetailScreen(
                     }
 
                     Button(
-                        onClick = onPlanEventClick,
+                        onClick = { onPlanEventClick(t.name) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = TrailGreen)
                     ) {

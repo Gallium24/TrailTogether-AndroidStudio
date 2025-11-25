@@ -3,10 +3,9 @@ package com.example.trailtogether_v01.ui.screens.feed
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,7 +24,17 @@ fun CreatePostScreen(
 ) {
     var content by remember { mutableStateOf("") }
     var isPublishing by remember { mutableStateOf(false) }
-    val selectedTrailId = "trail_1" // TODO: Remplacer par une vraie sélection
+
+    // États pour le Dropdown
+    val userTrails by feedViewModel.userHistoryTrails.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+    var selectedTrailId by remember { mutableStateOf("") }
+    var selectedTrailName by remember { mutableStateOf("") }
+
+    // Charger l'historique au lancement
+    LaunchedEffect(Unit) {
+        feedViewModel.loadUserTrailsForPost()
+    }
 
     Scaffold(
         topBar = {
@@ -39,22 +48,19 @@ fun CreatePostScreen(
                 actions = {
                     Button(
                         onClick = {
-                            if (isPublishing || content.isBlank()) return@Button
+                            if (isPublishing || content.isBlank() || selectedTrailId.isBlank()) return@Button
 
                             isPublishing = true
-
                             feedViewModel.createPost(
                                 trailId = selectedTrailId,
+                                trailName = selectedTrailName,
                                 content = content,
-                                onSuccess = {
-                                    onNavigateBack()
-                                },
-                                onFailure = {
-                                    isPublishing = false
-                                }
+                                onSuccess = { onNavigateBack() },
+                                onFailure = { isPublishing = false }
                             )
                         },
-                        enabled = !isPublishing && content.isNotBlank(),
+                        // On désactive le bouton si aucun sentier n'est sélectionné
+                        enabled = !isPublishing && content.isNotBlank() && selectedTrailId.isNotBlank(),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         if (isPublishing) {
@@ -75,8 +81,48 @@ fun CreatePostScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            // --- SÉLECTEUR DE SENTIER ---
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = if (selectedTrailName.isEmpty()) "Choisir une randonnée de votre historique" else selectedTrailName,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Lieu de la randonnée") },
+                    trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    if (userTrails.isEmpty()) {
+                        DropdownMenuItem(
+                            text = { Text("Aucun historique disponible") },
+                            onClick = { expanded = false }
+                        )
+                    } else {
+                        userTrails.forEach { trail ->
+                            DropdownMenuItem(
+                                text = { Text(trail.name) },
+                                onClick = {
+                                    selectedTrailId = trail.id
+                                    selectedTrailName = trail.name
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },

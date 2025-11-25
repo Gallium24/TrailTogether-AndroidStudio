@@ -33,6 +33,7 @@ import com.example.trailtogether_v01.ui.theme.TrailGreen
 fun ProfileScreen(
     onLogout: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
+    onNavigateToHistory: () -> Unit,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
     val user by profileViewModel.user.collectAsState()
@@ -150,7 +151,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedButton(
-            onClick = { },
+            onClick = onNavigateToHistory,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),

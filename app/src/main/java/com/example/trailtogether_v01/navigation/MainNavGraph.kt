@@ -26,6 +26,7 @@ import com.example.trailtogether_v01.ui.screens.home.TrailDetailScreen
 import com.example.trailtogether_v01.ui.screens.profile.EditProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.ProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
+import com.example.trailtogether_v01.ui.screens.profile.HistoryScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
 import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScreen
 
@@ -109,9 +110,8 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onLogout = onLogout,
-                onNavigateToEditProfile = {
-                    navController.navigate(Screen.EditProfile.route)
-                },
+                onNavigateToEditProfile = { navController.navigate(Screen.EditProfile.route) },
+                onNavigateToHistory = { navController.navigate(Screen.History.route) }
             )
         }
         composable(
@@ -131,6 +131,11 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             val postId = backStackEntry.arguments?.getString("postId") ?: return@composable
             CommentsScreen(
                 postId = postId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.History.route) {
+            HistoryScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -169,18 +174,25 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onPlanEventClick = {
-                    navController.navigate(Screen.CreateEvent.createRoute(trailId))
+                onPlanEventClick = { trailName ->
+                    // On navigue avec l'ID et le Nom
+                    navController.navigate(Screen.CreateEvent.createRoute(trailId, trailName))
                 }
             )
         }
         composable(
             route = Screen.CreateEvent.route,
-            arguments = listOf(navArgument("trailId") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("trailId") { type = NavType.StringType },
+                navArgument("trailName") { type = NavType.StringType; defaultValue = "Randonnée" }
+            )
         ) { backStackEntry ->
             val trailId = backStackEntry.arguments?.getString("trailId") ?: ""
+            val trailName = backStackEntry.arguments?.getString("trailName") ?: "Randonnée"
+
             CreateEventScreen(
                 trailId = trailId,
+                trailName = trailName,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

@@ -37,6 +37,25 @@ class FeedViewModel : ViewModel() {
         loadPosts()
     }
 
+    // Pour la sélection de sentier dans CreatePost
+    data class TrailSelection(val id: String, val name: String)
+
+    private val _userHistoryTrails = MutableStateFlow<List<TrailSelection>>(emptyList())
+    val userHistoryTrails: StateFlow<List<TrailSelection>> = _userHistoryTrails.asStateFlow()
+
+    fun loadUserTrailsForPost() {
+        val userId = auth.currentUser?.uid ?: return
+        viewModelScope.launch {
+            repository.getUserEvents(userId).collect { events ->
+                // On extrait les sentiers uniques des événements
+                val distinctTrails = events
+                    .map { TrailSelection(it.trailId, it.trailName) }
+                    .distinctBy { it.id } // On évite les doublons si on a fait 2 fois la même rando
+                _userHistoryTrails.value = distinctTrails
+            }
+        }
+    }
+
     private fun loadPosts() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -71,7 +90,7 @@ class FeedViewModel : ViewModel() {
         }
     }
 
-    fun createPost(trailId: String, content: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun createPost(trailId: String, trailName : String, content: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         // 'auth' est maintenant défini
         val currentUser = auth.currentUser ?: run {
             onFailure(Exception("Utilisateur non connecté"))
@@ -87,7 +106,7 @@ class FeedViewModel : ViewModel() {
             authorName = authorName,
             authorUsername = currentUser.email?.substringBefore('@') ?: "anonyme",
             trailId = trailId,
-            trailName = "Nom de la rando", // TODO: Récupérer le vrai nom de la rando
+            trailName = trailName,
             content = content,
             likesCount = 0,
             commentsCount = 0,

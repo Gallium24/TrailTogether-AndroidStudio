@@ -25,6 +25,7 @@ import java.util.Calendar
 @Composable
 fun CreateEventScreen(
     trailId: String,
+    trailName: String,
     onNavigateBack: () -> Unit
 ) {
     val repository = FirestoreRepository()
@@ -134,7 +135,7 @@ fun CreateEventScreen(
                             val user = auth.currentUser
                             val newEvent = Event(
                                 trailId = trailId,
-                                trailName = "Sentier #$trailId", // Amélioration possible : passer le nom du trail en argument
+                                trailName = trailName,
                                 organizerId = user?.uid ?: "",
                                 organizerName = user?.displayName ?: "Organisateur",
                                 date = selectedDate,

@@ -417,6 +417,23 @@ class FirestoreRepository {
             Log.e("FirestoreRepository", "Erreur lors de l'ajout du commentaire", e)
         }
     }
+
+    // --- Historique & Events Utilisateur ---
+
+    // Récupère tous les événements organisés par un utilisateur spécifique
+    fun getUserEvents(userId: String): Flow<List<Event>> = callbackFlow {
+        val listener = firestore.collection("events")
+            .whereEqualTo("organizerId", userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val events = snapshot?.documents?.mapNotNull { it.toObject<Event>(Event::class.java) } ?: emptyList()
+                trySend(events)
+            }
+        awaitClose { listener.remove() }
+    }
 /*
     suspend fun insertMockTrails() {
         val mockTrails = listOf(
