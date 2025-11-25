@@ -73,7 +73,10 @@ class FirestoreRepository {
     }
 
     fun getTrailById(id: String): Flow<Trail?> = callbackFlow {
-        val listener = firestore.collection("trails").document(id)
+        // Si c'est un trail OSM importé, on cherche dans le cache, sinon dans la collection principale
+        val collectionName = if (id.startsWith("osm_")) "cached_trails" else "trails"
+
+        val listener = firestore.collection(collectionName).document(id)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
@@ -85,14 +88,13 @@ class FirestoreRepository {
         awaitClose { listener.remove() }
     }
 
-    // Sauvegarder un trail (utile pour persister les trails OSM)
     suspend fun saveTrail(trail: Trail) {
         try {
-            // On utilise set avec merge pour ne pas écraser s'il existe déjà
-            firestore.collection("trails").document(trail.id)
+            // On sauvegarde dans 'cached_trails' pour ne pas polluer la recherche principale
+            firestore.collection("cached_trails").document(trail.id)
                 .set(trail, com.google.firebase.firestore.SetOptions.merge())
                 .await()
-            Log.d("FirestoreRepository", "Trail sauvegardé: ${trail.name}")
+            Log.d("FirestoreRepository", "Trail sauvegardé dans l'historique cache: ${trail.name}")
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "Erreur sauvegarde trail", e)
         }
