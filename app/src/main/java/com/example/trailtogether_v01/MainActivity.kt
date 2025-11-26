@@ -19,6 +19,7 @@ import com.example.trailtogether_v01.navigation.RootNavGraph
 
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 import com.example.trailtogether_v01.utils.OsmdroidInitializer
+import com.example.trailtogether_v01.utils.SettingsManager
 import org.osmdroid.config.Configuration
 
 /**
@@ -33,6 +34,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        SettingsManager.init(this)
 
         // Garde le splash screen actif tant qu'on ne sait pas si l'utilisateur est connecté
         installSplashScreen().setKeepOnScreenCondition {
@@ -54,7 +57,9 @@ class MainActivity : ComponentActivity() {
         }*/
 
         setContent {
-            TrailTogetherTheme {
+            val isDarkMode by SettingsManager.isDarkMode.collectAsState(initial = false)
+
+            TrailTogetherTheme(darkTheme = isDarkMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

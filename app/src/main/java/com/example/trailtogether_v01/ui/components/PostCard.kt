@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +54,7 @@ fun PostCard(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color.Gray)
+                        .background(MaterialTheme.colorScheme.surface)
                 )
                 Column {
                     Text(
@@ -64,7 +65,7 @@ fun PostCard(
                     Text(
                         text = android.text.format.DateFormat.format("dd MMM yyyy HH:mm", post.timestamp.toDate()).toString(),
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -78,7 +79,7 @@ fun PostCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.secondary)
         )
 
         // Footer
@@ -142,6 +143,6 @@ fun PostCard(
             }
         }
 
-        Divider()
+        HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
     }
 }

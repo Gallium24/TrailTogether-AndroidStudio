@@ -70,7 +70,7 @@ fun TrailDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBeige)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Header
         Row(
@@ -163,7 +163,7 @@ fun TrailDetailScreen(
                                 .fillMaxWidth()
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(Color.LightGray),
+                                .background(MaterialTheme.colorScheme.surface),
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -171,9 +171,9 @@ fun TrailDetailScreen(
                                     Icons.Default.Landscape,
                                     contentDescription = null,
                                     modifier = Modifier.size(64.dp),
-                                    tint = Color.Gray
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
-                                Text("Carte non disponible", color = Color.Gray)
+                                Text("Carte non disponible", color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }
@@ -220,7 +220,7 @@ fun TrailDetailScreen(
                                 StatColumn(
                                     icon = Icons.Default.DirectionsWalk,
                                     label = "Distance",
-                                    value = t.distance
+                                    value = t.distance.toString()
                                 )
                                 StatColumn(
                                     icon = Icons.Default.Schedule,
@@ -255,7 +255,7 @@ fun TrailDetailScreen(
                                 Text(
                                     text = "${t.reviewsCount} avis",
                                     fontSize = 12.sp,
-                                    color = Color.Gray,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.align(Alignment.CenterHorizontally)
                                 )
                             }

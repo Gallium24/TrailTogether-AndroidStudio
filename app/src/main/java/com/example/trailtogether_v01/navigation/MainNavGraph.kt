@@ -39,7 +39,6 @@ import com.example.trailtogether_v01.ui.screens.settings.SettingsScreen
 @Composable
 fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout: () -> Unit) {
     val homeViewModel: HomeViewModel = viewModel()
-    val settingsViewModel: SettingsViewModel = viewModel()
 
     val trailCache = remember { mutableMapOf<String, Trail>() }
 
@@ -85,8 +84,7 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Setting.route)
-                },
-                settingsViewModel = settingsViewModel
+                }
             )
         }
 
@@ -151,7 +149,6 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                     navController.popBackStack()
                 },
                 onSignOut = {
-                    // We use the onLogout passed to MainNavGraph
                     onLogout()
                 }
             )

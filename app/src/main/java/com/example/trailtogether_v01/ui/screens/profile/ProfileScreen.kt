@@ -41,7 +41,7 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBeige)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -50,7 +50,7 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            IconButton(onClick = { onNavigateToSettings }) {
+            IconButton(onClick = { onNavigateToSettings() }) {
                 Icon(Icons.Default.Settings, contentDescription = "Paramètres")
             }
         }
@@ -83,7 +83,7 @@ fun ProfileScreen(
         Text(
             text = "@${user?.username ?: "username"}",
             fontSize = 16.sp,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         if (user?.bio?.isNotEmpty() == true) {
