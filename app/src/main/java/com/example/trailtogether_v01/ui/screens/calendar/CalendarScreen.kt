@@ -40,8 +40,6 @@ fun CalendarScreen(
     val allEvents by viewModel.allEvents.collectAsState()
 
     // Gestion simple du changement de mois (pour l'affichage)
-    // Note: Pour une vraie gestion complète, le ViewModel devrait gérer le "Mois affiché" indépendamment de la "Date sélectionnée".
-    // Ici, on synchronise le mois affiché sur la date sélectionnée pour simplifier.
     val monthName = selectedDate.month.getDisplayName(TextStyle.FULL, Locale.FRENCH).replaceFirstChar { it.uppercase() }
     val year = selectedDate.year
 
@@ -126,7 +124,7 @@ fun CalendarScreen(
                         ) {
                             Text(
                                 text = day.toString(),
-                                color = if (isSelected) Color.White else Color.Black,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
                                 fontWeight = if (hasEvent) FontWeight.Bold else FontWeight.Normal
                             )
                         }
