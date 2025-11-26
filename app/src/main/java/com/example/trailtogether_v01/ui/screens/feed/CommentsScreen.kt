@@ -47,14 +47,14 @@ fun CommentsScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundBeige)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         bottomBar = {
             // Zone de saisie du commentaire
             Surface(
                 shadowElevation = 8.dp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.surface
             ) {
                 Row(
                     modifier = Modifier
@@ -104,7 +104,7 @@ fun CommentsScreen(
                 item {
                     Text(
                         "Soyez le premier à commenter !",
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(top = 32.dp)
                     )
                 }
@@ -122,7 +122,7 @@ fun CommentItem(comment: Comment) {
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(Color.LightGray, CircleShape),
+                .background(MaterialTheme.colorScheme.onSurface, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Default.Person, contentDescription = null, tint = Color.White)
@@ -138,14 +138,14 @@ fun CommentItem(comment: Comment) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = android.text.format.DateFormat.format("dd MMM HH:mm", comment.timestamp.toDate()).toString(),
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp
                 )
             }
             Text(
                 text = comment.content,
                 fontSize = 14.sp,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

@@ -37,14 +37,14 @@ fun HistoryScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundBeige)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundBeige)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)

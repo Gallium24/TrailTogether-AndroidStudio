@@ -43,9 +43,20 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.trailtogether_v01.data.models.Difficulty
 import kotlinx.coroutines.launch
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.createBitmap
+import com.example.trailtogether_v01.data.viewmodel.SettingsViewModel
+import com.example.trailtogether_v01.utils.MapUtils.OpenTopoMapSource
+import com.example.trailtogether_v01.utils.SettingsManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+
 
 /**
  * HomeScreen est la composante de l'écran d'accueil.
@@ -57,7 +68,8 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     onNavigateToTrailDetail: (String) -> Unit,
     onNavigateToCalendar: () -> Unit,
-    homeViewModel: HomeViewModel = viewModel()
+    onNavigateToSettings: () -> Unit,
+    homeViewModel: HomeViewModel = viewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -72,13 +84,35 @@ fun HomeScreen(
 
     val savedMapCenter by homeViewModel.mapCenter.collectAsState()
     val savedMapZoom by homeViewModel.mapZoom.collectAsState()
-    val showTrailPath by homeViewModel.showTrailPath.collectAsState()
+    val showTrailPath by SettingsManager.showTrailPath.collectAsState(initial = true)
+    // === Settings from SettingsManager ===
+    val useImperial by SettingsManager.useImperialUnits.collectAsState(initial = false)
+    val mapStyle by SettingsManager.mapStyle.collectAsState(initial = "Mapnik")
+    val isShowTrailPath by SettingsManager.showTrailPath.collectAsState(initial = true)
+    val defaultRadiusKm by SettingsManager.defaultRadiusKm.collectAsState(initial = 5f)
 
     val context = LocalContext.current
     var showRadiusDialog by remember { mutableStateOf(false) }
-    var radiusMeters by remember { mutableStateOf(5000f) }
 
     var mapViewRef by remember { mutableStateOf<MapView?>(null) }
+    var tempRadiusKm by rememberSaveable { mutableFloatStateOf(defaultRadiusKm) }
+
+    LaunchedEffect(Unit) {
+        val savedRadiusKm = SettingsManager.defaultRadiusKm.first() // Lit la vraie valeur persistante
+        tempRadiusKm = savedRadiusKm * 1000f // Convertit en mètres
+        homeViewModel.loadMapTrails(savedMapCenter, tempRadiusKm)
+    }
+
+    LaunchedEffect(tempRadiusKm) {
+        homeViewModel.loadMapTrails(savedMapCenter, tempRadiusKm)
+    }
+
+    LaunchedEffect(mapStyle) {
+        mapViewRef?.let { map ->
+            map.setTileSource(if (mapStyle == "OpenTopoMap") OpenTopoMapSource else TileSourceFactory.MAPNIK)
+            map.invalidate()
+        }
+    }
 
     val mapTrails = remember(allTrails, selectedDifficulty) {
         allTrails.filter {
@@ -91,7 +125,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBeige)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Header
         Row(
@@ -117,10 +151,15 @@ fun HomeScreen(
                 }
                 IconButton(onClick = { showRadiusDialog = true }) {
                     Badge(containerColor = MaterialTheme.colorScheme.primary) {
-                        Text("${(radiusMeters / 1000).toInt()}km", fontSize = 10.sp)
+                        val radiusText = if (useImperial) {
+                            "${(tempRadiusKm * 0.000621371).toInt()} mi"
+                        } else {
+                            "${(tempRadiusKm / 1000).toInt()} km"
+                        }
+                        Text(radiusText, fontSize = 10.sp)
                     }
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = onNavigateToSettings) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings")
                 }
             }
@@ -177,7 +216,11 @@ fun HomeScreen(
                     Text("Tracés", fontSize = 12.sp, modifier = Modifier.padding(end = 10.dp))
                     Switch(
                         checked = showTrailPath,
-                        onCheckedChange = { homeViewModel.toggleShowTrailPath() },
+                        onCheckedChange = { checked ->
+                            coroutineScope.launch {
+                                SettingsManager.setShowTrailPath(checked)
+                            }
+                        },
                         modifier = Modifier.size(40.dp, 24.dp)
                     )
                 }
@@ -223,7 +266,7 @@ fun HomeScreen(
                                     homeViewModel.updateMapPosition(newCenter, newZoom)
 
                                     if (newCenter.distanceToAsDouble(savedMapCenter) > 2000) {
-                                        homeViewModel.loadMapTrails(newCenter, radiusMeters)
+                                        homeViewModel.loadMapTrails(newCenter, tempRadiusKm)
                                     }
                                 }
                                 return true
@@ -293,7 +336,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -305,7 +348,7 @@ fun HomeScreen(
                             Text(trail.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Chip(trail.distance)
+                                Chip(trail.distance.toString())
                                 Chip(trail.duration)
                                 Chip(trail.difficulty.toDisplayString())
                             }
@@ -373,10 +416,10 @@ fun HomeScreen(
             title = { Text("Rayon de recherche") },
             text = {
                 Column {
-                    Text("${(radiusMeters / 1000).toInt()} km")
+                    Text("${(tempRadiusKm / 1000).toInt()} km")
                     Slider(
-                        value = radiusMeters,
-                        onValueChange = { radiusMeters = it },
+                        value = tempRadiusKm,
+                        onValueChange = { tempRadiusKm = it },
                         valueRange = 1000f..20000f, // Max 20km pour éviter lag
                         steps = 18
                     )
@@ -385,7 +428,7 @@ fun HomeScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    homeViewModel.refreshTrailsWithRadius(savedMapCenter, radiusMeters)
+                    homeViewModel.refreshTrailsWithRadius(savedMapCenter, tempRadiusKm)
                     showRadiusDialog = false
                 }) { Text("Rechercher") }
             },
@@ -396,7 +439,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        homeViewModel.loadMapTrails(savedMapCenter, radiusMeters)
+        homeViewModel.loadMapTrails(savedMapCenter, tempRadiusKm)
     }
 }
 
@@ -436,7 +479,7 @@ private fun createMarkerIcon(
     val size = if (isSelected) 70 else 50 // Plus gros si sélectionné
     val height = if (isSelected) 90 else 70
 
-    val bitmap = Bitmap.createBitmap(size, height, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(size, height)
     val canvas = Canvas(bitmap)
     val paint = Paint().apply {
         color = getDifficultyColor(difficulty)
@@ -461,5 +504,15 @@ private fun createMarkerIcon(
     paint.color = android.graphics.Color.WHITE
     canvas.drawCircle(centerX, centerX, radius, paint)
 
-    return BitmapDrawable(context.resources, bitmap)
+    return bitmap.toDrawable(context.resources)
+}
+
+fun formatDistance(meters: Float, useImperial: Boolean): String {
+    return if (useImperial) {
+        val miles = meters * 0.000621371
+        "%.1f mi".format(miles)
+    } else {
+        val km = meters / 1000
+        "%.1f km".format(km)
+    }
 }

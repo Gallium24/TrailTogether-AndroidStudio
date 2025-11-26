@@ -222,7 +222,9 @@ fun EventDetailScreen(
                     ) {
                         // On priorise les infos du Trail complet (distance/durée précises)
                         // Sinon on utilise celles de l'event (souvent vides ou par défaut)
-                        val displayDistance = associatedTrail?.distance?.ifEmpty { event!!.distance } ?: "?"
+                        val displayDistance = associatedTrail?.distance?.toString()?.takeIf { it.isNotBlank() }
+                            ?: event!!.distance.toString().takeIf { it.isNotBlank() }
+                            ?: "?"
                         val displayDuration = associatedTrail?.duration?.ifEmpty { event!!.duration } ?: "?"
 
                         StatColumn(Icons.Default.DirectionsWalk, "Distance", displayDistance)

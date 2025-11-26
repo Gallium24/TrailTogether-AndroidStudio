@@ -48,14 +48,14 @@ fun CalendarScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBeige)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         // --- Calendrier ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -66,15 +66,16 @@ fun CalendarScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { viewModel.onDateSelected(selectedDate.minusMonths(1)) }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Précédent")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Précédent", tint = MaterialTheme.colorScheme.onSurface)
                     }
                     Text(
                         text = "$monthName $year",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     IconButton(onClick = { viewModel.onDateSelected(selectedDate.plusMonths(1)) }) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "Suivant")
+                        Icon(Icons.Default.ArrowForward, contentDescription = "Suivant", tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
@@ -83,7 +84,7 @@ fun CalendarScreen(
                 // Jours de la semaine
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     listOf("Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa").forEach { day ->
-                        Text(text = day, fontWeight = FontWeight.SemiBold, color = Color.Gray)
+                        Text(text = day, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
 
@@ -140,13 +141,14 @@ fun CalendarScreen(
         Text(
             text = "Événements du ${selectedDate.dayOfMonth} $monthName",
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (eventsForDate.isEmpty()) {
-            Text("Aucun événement prévu ce jour-là.", color = Color.Gray, modifier = Modifier.padding(top = 16.dp))
+            Text("Aucun événement prévu ce jour-là.", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 16.dp))
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(eventsForDate) { event ->

@@ -25,7 +25,7 @@ data class Trail(
     val id: String = "",
     val name: String = "",
     val location: String = "",
-    val distance: String = "",
+    val distance: Double? = null,
     val duration: String = "",
     val difficulty: Difficulty = Difficulty.EASY,
     val rating: Float = 0f,

@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
+import com.example.trailtogether_v01.data.viewmodel.SettingsViewModel
 import com.example.trailtogether_v01.ui.screens.calendar.CalendarScreen
 import com.example.trailtogether_v01.ui.screens.calendar.EventDetailScreen
 import com.example.trailtogether_v01.ui.screens.feed.CreatePostScreen
@@ -30,6 +31,7 @@ import com.example.trailtogether_v01.ui.screens.profile.UserProfileScreen
 import com.example.trailtogether_v01.ui.screens.profile.HistoryScreen
 import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
 import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScreen
+import com.example.trailtogether_v01.ui.screens.settings.SettingsScreen
 
 
 /**
@@ -39,6 +41,7 @@ import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScree
 @Composable
 fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout: () -> Unit) {
     val homeViewModel: HomeViewModel = viewModel()
+
     val trailCache = remember { mutableMapOf<String, Trail>() }
 
     val allTrails by homeViewModel.allTrails.collectAsState()
@@ -80,6 +83,9 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
                 } ,
                 onNavigateToCalendar = {
                     navController.navigate(Screen.Calendar.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Setting.route)
                 }
             )
         }
@@ -111,8 +117,15 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onLogout = onLogout,
-                onNavigateToEditProfile = { navController.navigate(Screen.EditProfile.route) },
-                onNavigateToHistory = { navController.navigate(Screen.History.route) }
+                onNavigateToEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Setting.route)
+                },
+                onNavigateToHistory = {
+                    navController.navigate(Screen.History.route)
+                }
             )
         }
         composable(
@@ -133,6 +146,16 @@ fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout:
             CommentsScreen(
                 postId = postId,
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Setting.route) {
+            SettingsScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onSignOut = {
+                    onLogout()
+                }
             )
         }
         composable(Screen.History.route) {

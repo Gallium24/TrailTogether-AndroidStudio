@@ -20,6 +20,8 @@ sealed class Screen(val route: String) {
     object Calendar : Screen("calendar_screen")
     object History : Screen("history_screen")
 
+    object Setting : Screen("settings_screen")
+
     object CreateEvent : Screen("create_event_screen/{trailId}?trailName={trailName}") {
         fun createRoute(trailId: String, trailName: String) = "create_event_screen/$trailId?trailName=$trailName"
     }

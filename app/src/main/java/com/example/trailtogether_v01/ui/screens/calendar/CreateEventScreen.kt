@@ -131,7 +131,7 @@ fun CreateEventScreen(
                                 date = selectedDate,
                                 time = selectedTime,
                                 description = description,
-                                distance = trail?.distance ?: "",
+                                distance = (trail?.distance ?: "").toString(),
                                 duration = trail?.duration ?: "",
                                 difficulty = trail?.difficulty ?: com.example.trailtogether_v01.data.models.Difficulty.EASY,
                                 participantsCount = 1,
