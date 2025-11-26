@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import android.util.Log
+import kotlinx.coroutines.delay
 
 class HomeViewModel(
     private val savedStateHandle: SavedStateHandle = SavedStateHandle()
@@ -110,7 +111,7 @@ class HomeViewModel(
         val osmTrails = _osmTrails.value
         val totalTrails = osmTrails.size
         val totalDistance = osmTrails.sumOf { trail ->
-            trail.distance.replace(" km", "").toDoubleOrNull() ?: 0.0
+            trail.distance ?: 0.0
         }
         val totalElevation = osmTrails.sumOf { trail ->
             trail.elevation.split("m")[0].toIntOrNull() ?: 0
@@ -149,7 +150,6 @@ class HomeViewModel(
         }
     }
 
-    // 🔥 NOUVEAUTÉ: Sauvegarder la position de la carte
     fun updateMapPosition(center: GeoPoint, zoom: Double) {
         _mapCenter.value = center
         _mapZoom.value = zoom
@@ -157,7 +157,6 @@ class HomeViewModel(
         savedStateHandle["mapZoom"] = zoom
     }
 
-    // 🔥 NOUVEAUTÉ: Toggle tracés
     fun toggleShowTrailPath() {
         _showTrailPath.value = !_showTrailPath.value
         savedStateHandle["showTrailPath"] = _showTrailPath.value

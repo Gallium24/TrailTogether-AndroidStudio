@@ -32,7 +32,7 @@ fun EventCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceBeige),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -49,7 +49,7 @@ fun EventCard(
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .background(Color(0xFF5A5A5A), RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
                 )
 
                 Column {
@@ -57,7 +57,7 @@ fun EventCard(
                         text = event.trailName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = TextDark
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -67,13 +67,13 @@ fun EventCard(
                                 Icons.Default.AccessTime,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = Color.Gray
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "${event.date} ${event.time}",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -81,20 +81,20 @@ fun EventCard(
                                 Icons.Default.Group,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = Color.Gray
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "${event.participantsCount}/${event.maxParticipants}",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
                     Text(
                         text = event.distance,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

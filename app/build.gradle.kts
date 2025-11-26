@@ -73,6 +73,7 @@ dependencies {
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Coil pour charger les images
     implementation("io.coil-kt:coil-compose:2.5.0")
@@ -100,6 +101,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.compose.animation.graphics)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.preferences.core)
 
     // Google Play Services Location
     implementation("com.google.android.gms:play-services-location:21.1.0")

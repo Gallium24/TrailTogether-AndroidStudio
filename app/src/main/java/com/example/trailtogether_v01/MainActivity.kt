@@ -30,6 +30,7 @@ import com.example.trailtogether_v01.services.LocationService
 
 import com.example.trailtogether_v01.ui.theme.TrailTogetherTheme
 import com.example.trailtogether_v01.utils.OsmdroidInitializer
+import com.example.trailtogether_v01.utils.SettingsManager
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -58,6 +59,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        SettingsManager.init(this)
+
         // Garde le splash screen actif tant qu'on ne sait pas si l'utilisateur est connecté
         installSplashScreen().setKeepOnScreenCondition {
             authViewModel.authState.value is AuthState.Idle
@@ -78,7 +81,9 @@ class MainActivity : ComponentActivity() {
         }*/
 
         setContent {
-            TrailTogetherTheme {
+            val isDarkMode by SettingsManager.isDarkMode.collectAsState(initial = false)
+
+            TrailTogetherTheme(darkTheme = isDarkMode) {
                 var initialLocation by remember { mutableStateOf<GeoPoint?>(null) }
                 var locationReady by remember { mutableStateOf(false) }
 

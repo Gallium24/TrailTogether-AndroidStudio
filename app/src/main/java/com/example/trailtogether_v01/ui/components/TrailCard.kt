@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +31,6 @@ fun TrailCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceBeige),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -46,7 +46,7 @@ fun TrailCard(
                         text = trail.name,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Row(
@@ -57,12 +57,12 @@ fun TrailCard(
                             Icons.Default.Place,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = trail.location,
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -78,7 +78,7 @@ fun TrailCard(
             ) {
                 TrailStat(
                     icon = Icons.Default.DirectionsWalk,
-                    value = trail.distance
+                    value = trail.distance.toString()
                 )
                 TrailStat(
                     icon = Icons.Default.Schedule,
@@ -108,13 +108,13 @@ fun TrailCard(
                                 Icons.Default.TrendingUp,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = Color.Gray
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = trail.elevation.split("/").firstOrNull()?.trim() ?: trail.elevation,
                                 fontSize = 14.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -134,12 +134,12 @@ fun TrailStat(icon: ImageVector, value: String) {
             icon,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = Color.Gray
+            MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = value,
             fontSize = 14.sp,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
