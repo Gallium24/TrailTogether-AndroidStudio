@@ -16,24 +16,70 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 
 /**
- * FirestoreRepository est la seule source de vérité pour l'accès aux données distantes sur Firestore.
- * Il agit comme un médiateur entre les ViewModels et la base de données Firebase.
- * Il expose les données sous forme de Flow pour permettre une observation réactive des changements.
+ * FirestoreRepository.kt
  *
- * Responsabilités :
- * - Récupérer la liste des sentiers (trails) et des posts.
- * - Gérer les opérations sur les posts (création, like).
- * - Gérer les opérations sur les utilisateurs (récupération, mise à jour du profil).
+ * Repository central gérant toutes les interactions avec Firebase Firestore.
+ * Point unique de contact avec la base de données pour les données sociales.
  *
- * Cette classe abstrait complètement la complexité de Firestore pour le reste de l'application.
+ * Collections gérées:
+ * - users: Profils utilisateurs
+ * - posts: Publications du fil d'actualité
+ * - trails: Sentiers custom (en plus d'OSM)
+ * - events: Événements de randonnée en groupe
+ * - notifications: Notifications in-app
+ * - posts/{postId}/comments: Commentaires sur les posts
+ *
+ * Fonctionnalités principales:
+ *
+ * Utilisateurs:
+ * - getUserById(): Récupère un utilisateur par ID
+ * - createUser(): Crée un nouvel utilisateur
+ * - updateUser(): Met à jour les informations utilisateur
+ * - updateUserHistory(): Ajoute une randonnée à l'historique
+ *
+ * Posts:
+ * - getPosts(): Flow réactif des posts (tri par timestamp desc)
+ * - createPost(): Crée un nouveau post
+ * - likePost(): Gère le like/unlike d'un post
+ * - getPostById(): Récupère un post spécifique
+ *
+ * Sentiers:
+ * - getTrails(): Flow réactif des sentiers Firestore
+ * - getTrailById(): Récupère un sentier par ID
+ *
+ * Événements:
+ * - getEvents(): Flow réactif des événements
+ * - getEventById(): Récupère un événement spécifique
+ * - createEvent(): Crée un nouvel événement
+ * - registerForEvent(): Inscrit un utilisateur à un événement
+ * - unregisterFromEvent(): Désinscrit un utilisateur
+ *
+ * Notifications:
+ * - getNotifications(): Flow des notifications d'un utilisateur
+ * - createNotification(): Crée une nouvelle notification
+ * - markNotificationAsRead(): Marque une notification comme lue
+ * - getUnreadNotificationCount(): Compte les notifications non lues
+ * - getPostAuthorId(): Récupère l'ID de l'auteur d'un post
+ *
+ * Commentaires:
+ * - getComments(): Flow des commentaires d'un post
+ * - addComment(): Ajoute un commentaire à un post
+ *
+ * Patterns utilisés:
+ * - Flow pour données réactives (mises à jour automatiques)
+ * - Suspend functions pour opérations asynchrones
+ * - try-catch avec logging pour gestion d'erreurs
+ *
+ * Utilisation:
+ * - Instancié dans chaque ViewModel concerné
+ * - Tous les appels Firestore passent par ce repository (Single Source of Truth)
  */
+
 class FirestoreRepository {
 
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
-    // Note: Les méthodes login/register ne sont pas utilisées dans AuthViewModel car l'auth est gérée directement là-bas.
-    // Mais si besoin, on peut les implémenter avec Firestore pour stocker l'utilisateur après création.
 
     fun getCurrentUser(): Flow<User?> = callbackFlow {
         val uid = auth.currentUser?.uid ?: run {

@@ -24,6 +24,55 @@ import com.example.trailtogether_v01.data.viewmodel.CommentsViewModel
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * CommentsScreen.kt
+ *
+ * Écran affichant les commentaires d'un post et permettant d'en ajouter.
+ *
+ * Fonctionnalités:
+ * - Affichage de la liste des commentaires
+ * - Ajout de nouveaux commentaires
+ * - Affichage de l'auteur et timestamp de chaque commentaire
+ * - Scroll automatique vers le bas lors de l'ajout
+ *
+ * Layout:
+ * - Header: Titre "Commentaires" avec bouton retour
+ * - Liste: Commentaires avec avatars et noms
+ * - Bottom bar: Zone de saisie + bouton envoyer
+ *
+ * Affichage commentaire:
+ * - Avatar de l'auteur (ou initiale)
+ * - Nom de l'auteur
+ * - Contenu du commentaire
+ * - Timestamp relatif (ex: "Il y a 5 min")
+ *
+ * Zone de saisie:
+ * - TextField multilignes
+ * - Bouton "Envoyer" (icône Send)
+ * - Désactivé si texte vide
+ * - Se vide après envoi
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Liste vide: "Aucun commentaire pour l'instant"
+ * - Avec commentaires: LazyColumn scrollable
+ *
+ * Notifications:
+ * - Création automatique de notification pour l'auteur du post
+ * - Type: COMMENT
+ * - Pas de notification si l'auteur commente son propre post
+ *
+ * Interactions:
+ * - Clic sur nom d'auteur → UserProfileScreen (si implémenté)
+ * - Envoi → Crée commentaire + notification + incrémente compteur
+ *
+ * Utilisation:
+ * - Navigation depuis FeedScreen (clic sur icône commentaires)
+ * - Paramètre: postId
+ * - CommentsViewModel géré automatiquement avec postId
+ * - Partie de MainNavGraph
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentsScreen(

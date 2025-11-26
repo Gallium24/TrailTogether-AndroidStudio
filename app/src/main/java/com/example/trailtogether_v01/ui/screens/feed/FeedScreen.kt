@@ -20,15 +20,69 @@ import com.example.trailtogether_v01.data.viewmodel.NotificationsViewModel
 import com.example.trailtogether_v01.ui.components.PostCard
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * FeedScreen.kt
+ *
+ * Écran du fil d'actualité affichant les posts des utilisateurs.
+ *
+ * Fonctionnalités:
+ * - Affichage du flux de posts (temps réel)
+ * - Like/unlike des posts
+ * - Navigation vers les commentaires
+ * - Navigation vers les profils utilisateurs
+ * - Navigation vers les sentiers liés
+ * - Bouton de création de post
+ * - Bouton vers les notifications
+ *
+ * Layout:
+ * - Header: "Fil d'actualité" + icône notifications (avec badge)
+ * - Liste: PostCard pour chaque post
+ * - FloatingActionButton: Création de post
+ *
+ * PostCard interactions:
+ * - Clic sur auteur → UserProfileScreen
+ * - Clic sur like → Toggle like/unlike
+ * - Clic sur commentaires → CommentsScreen
+ * - Clic sur sentier lié → TrailDetailScreen
+ *
+ * Badge notifications:
+ * - Affiché si unreadCount > 0
+ * - Affiche le nombre exact
+ * - Couleur rouge pour visibilité
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Liste vide: "Aucune publication pour l'instant"
+ * - Avec posts: LazyColumn scrollable
+ *
+ * Tri des posts:
+ * - Par timestamp décroissant (plus récents en premier)
+ * - Mises à jour en temps réel via Flow
+ *
+ * FloatingActionButton:
+ * - Position: Bas à droite
+ * - Icône: Add
+ * - Couleur: TrailGreen
+ * - Action: Navigate vers CreatePostScreen
+ *
+ * Intégration:
+ * - FeedViewModel pour données et logique
+ * - NotificationViewModel pour badge
+ * - Flow réactif des posts
+ *
+ * Utilisation:
+ * - Accessible via BottomNavBar (icône Feed)
+ * - Partie de MainNavGraph
+ */
+
 @Composable
 fun FeedScreen(
     onNavigateToCreatePost: () -> Unit,
     onNavigateToUserProfile: (String) -> Unit,
     onNavigateToComments: (String) -> Unit,
-    onNavigateToNotifications: () -> Unit, // 🔥 NOUVEAU paramètre
+    onNavigateToNotifications: () -> Unit,
     feedViewModel: FeedViewModel = viewModel()
 ) {
-    // 🔥 NOUVEAU: ViewModel notifications
     val notificationsViewModel: NotificationsViewModel = viewModel()
     val unreadCount by notificationsViewModel.unreadCount.collectAsState()
 

@@ -46,6 +46,79 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 
+/**
+ * TrailDetailScreen.kt
+ *
+ * Écran affichant les détails complets d'un sentier avec carte et statistiques.
+ *
+ * Fonctionnalités:
+ * - Affichage de toutes les informations du sentier
+ * - Carte avec marqueur au point de départ
+ * - Tracé du sentier (si disponible)
+ * - Statistiques complètes
+ * - Bouton de planification d'événement
+ * - Bouton d'ajout à l'historique
+ *
+ * Sections:
+ * 1. Header:
+ *    - Bouton retour
+ *    - Titre "Détails du sentier"
+ *
+ * 2. Carte du sentier:
+ *    - Marqueur au point de départ
+ *    - Polyline du tracé (si pathCoordinates disponible)
+ *    - Zoom adapté pour voir tout le sentier
+ *    - Hauteur: 200.dp
+ *
+ * 3. Informations principales:
+ *    - Nom du sentier (grand titre)
+ *    - Localisation avec icône
+ *    - Badge de difficulté
+ *
+ * 4. Carte des statistiques:
+ *    - Distance (formatée en km ou mi)
+ *    - Durée estimée
+ *    - Note/Avis OU Dénivelé (selon source)
+ *    - Présentation en colonnes égales
+ *
+ * 5. Description:
+ *    - Texte descriptif du sentier
+ *    - Tags (type de surface, type de chemin)
+ *
+ * 6. Bouton d'action:
+ *    - "Planifier un événement" → CreateEventScreen
+ *    - Pleine largeur, couleur TrailGreen
+ *
+ * Carte personnalisée:
+ * - Marqueur avec couleur selon difficulté
+ * - Polyline avec couleur selon difficulté
+ * - Centrage automatique sur le sentier
+ *
+ * Statistiques:
+ * - StatColumn component pour affichage uniforme
+ * - Icônes: DirectionsWalk, Schedule, Star/TrendingUp
+ * - Valeurs formatées selon préférences utilisateur
+ *
+ * Gestion des sources:
+ * - Firestore: Affiche rating et reviewsCount
+ * - OSM: Affiche dénivelé (gain/perte)
+ * - Adaptation automatique selon trail.source
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Trail chargé: Affichage complet
+ * - Erreur: Message d'erreur
+ *
+ * Modes de chargement:
+ * - Preloaded: Trail passé depuis HomeScreen (sentiers OSM)
+ * - Fetch: Chargé depuis Firestore par ID
+ *
+ * Utilisation:
+ * - Navigation depuis HomeScreen (clic sur TrailCard ou marqueur)
+ * - Navigation depuis EventCard (clic sur nom sentier)
+ * - Paramètre: trailId + preloadedTrail optionnel
+ * - Partie de MainNavGraph
+ */
 
 @Composable
 fun TrailDetailScreen(

@@ -58,12 +58,83 @@ import com.example.trailtogether_v01.utils.SettingsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
-
 /**
- * HomeScreen est la composante de l'écran d'accueil.
- * @param onNavigateToTrailDetail Une fonction lambda appelée lorsque l'utilisateur clique sur un itinéraire.
- * @param homeViewModel Le ViewModel de l'accueil.
+ * HomeScreen.kt
+ *
+ * Écran principal de l'application affichant la carte interactive et la liste des sentiers.
+ *
+ * Fonctionnalités principales:
+ * - Carte interactive OSMDroid avec marqueurs de sentiers
+ * - Liste des sentiers avec filtres et recherche
+ * - Géolocalisation et centrage sur position utilisateur
+ * - Filtrage par difficulté (EASY, MODERATE, HARD, EXPERT)
+ * - Recherche textuelle (nom et localisation)
+ * - Ajustement du rayon de recherche (1-100 km)
+ * - Affichage des tracés de sentiers sur la carte
+ * - Sélection d'un sentier (card popup sur la carte)
+ *
+ * Composants principaux:
+ * 1. Header:
+ *    - Titre "Sentiers"
+ *    - Icônes: Calendrier, Paramètres
+ *
+ * 2. Barre de recherche:
+ *    - TextField avec icône de recherche
+ *    - Recherche en temps réel
+ *    - Placeholder: "Rechercher un sentier..."
+ *
+ * 3. Filters:
+ *    - DifficultyFilterChips (EASY, MODERATE, HARD, EXPERT)
+ *    - Slider de rayon (1-100 km)
+ *
+ * 4. Carte OSMDroid:
+ *    - Marqueurs pour chaque sentier avec couleur selon difficulté
+ *    - Polylines pour tracés (si activé dans paramètres)
+ *    - Zoom et pan interactifs
+ *    - Centrage sur position utilisateur
+ *    - Clic sur marqueur → Affiche card du sentier
+ *
+ * 5. Liste des sentiers:
+ *    - LazyColumn de TrailCard
+ *    - Filtrée selon recherche et difficulté
+ *    - Clic sur carte → Anime vers le sentier sur la carte
+ *    - Clic sur card → Navigate vers TrailDetailScreen
+ *
+ * 6. Card de sentier sélectionné (sur la carte):
+ *    - Nom, distance, durée, difficulté
+ *    - Dénivelé (si disponible)
+ *    - Bouton fermer
+ *    - Bouton "Voir détails"
+ *
+ * Marqueurs personnalisés:
+ * - Couleur selon difficulté:
+ *   - EASY: Vert
+ *   - MODERATE: Orange
+ *   - HARD: Orange foncé
+ *   - EXPERT: Rouge
+ *
+ * États:
+ * - isLoadingMapTrails: Indicateur de chargement sentiers OSM
+ * - errorMessage: Message d'erreur si échec de chargement
+ * - selectedTrail: Sentier sélectionné sur la carte
+ *
+ * Optimisations:
+ * - Cache des sentiers par position et rayon
+ * - Chargement initial sans géocodage (rapide)
+ * - Limite de 20 sentiers par zone
+ * - Filtrage côté client pour réactivité
+ *
+ * Intégration:
+ * - HomeViewModel pour toute la logique
+ * - SettingsManager pour préférences (unités, rayon, style carte)
+ * - LocationService pour position GPS
+ *
+ * Utilisation:
+ * - Route par défaut de MainNavGraph
+ * - Premier écran après connexion
+ * - Accessible via BottomNavBar (icône Home/Map)
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(

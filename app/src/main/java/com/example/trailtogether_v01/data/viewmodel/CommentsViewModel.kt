@@ -12,6 +12,42 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * CommentsViewModel.kt
+ *
+ * Gère l'affichage et l'ajout de commentaires sur les posts.
+ *
+ * Fonctionnalités:
+ * - Chargement des commentaires d'un post (Flow réactif)
+ * - Ajout de nouveau commentaire
+ * - Création de notification pour l'auteur du post
+ * - Incrémentation du compteur de commentaires
+ *
+ * StateFlows exposés:
+ * - comments: Liste des commentaires du post actuel
+ * - isLoading: Indicateur de chargement
+ *
+ * Méthodes:
+ * - loadComments(postId): Charge les commentaires d'un post
+ * - sendComment(content): Envoie un nouveau commentaire
+ *   - Crée le commentaire dans Firestore
+ *   - Incrémente commentsCount du post
+ *   - Crée notification pour l'auteur du post
+ *
+ * Logique de notification:
+ * - Ne crée pas de notification si l'auteur commente son propre post
+ * - Notification de type COMMENT
+ * - Contient le nom du commentateur et le début du commentaire
+ *
+ * Initialisation:
+ * - Nécessite le postId passé lors de la création
+ * - Charge automatiquement les commentaires au démarrage
+ *
+ * Utilisation:
+ * - Utilisé par CommentsScreen
+ * - Un ViewModel par post (nouvelle instance pour chaque écran de commentaires)
+ */
+
 class CommentsViewModel : ViewModel() {
     private val repository = FirestoreRepository()
     private val auth = FirebaseAuth.getInstance()

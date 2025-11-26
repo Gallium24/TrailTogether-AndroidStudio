@@ -1,9 +1,49 @@
 package com.example.trailtogether_v01.navigation
 
 /**
- * Screen est une sealed class qui représente les différents écrans de l'application.
- * Chaque écran a une route unique qui est utilisée pour identifier l'écran dans la navigation.
+ * Screen.kt
+ *
+ * Définit toutes les routes de navigation de l'application de manière centralisée et type-safe.
+ *
+ * Pattern sealed class:
+ * - Garantit que toutes les routes sont connues à la compilation
+ * - Évite les erreurs de typage dans les strings de routes
+ * - Facilite la maintenance (ajout/suppression de routes)
+ *
+ * Routes définies:
+ *
+ * Auth:
+ * - Login: "login"
+ * - Register: "register"
+ *
+ * Main:
+ * - Home: "home"
+ * - Feed: "feed"
+ * - Calendar: "calendar"
+ * - Profile: "profile"
+ * - Settings: "settings"
+ *
+ * Details:
+ * - TrailDetail: "trail_detail/{trailId}"
+ * - EventDetail: "event_detail/{eventId}"
+ * - UserProfile: "user_profile/{userId}"
+ *
+ * Create:
+ * - CreatePost: "create_post"
+ * - CreateEvent: "create_event/{trailId}"
+ *
+ * Other:
+ * - Comments: "comments/{postId}"
+ * - Notifications: "notifications"
+ * - EditProfile: "edit_profile"
+ * - History: "history"
+ *
+ * Utilisation:
+ * - Référencé dans tous les NavGraph (AuthNavGraph, MainNavGraph, RootNavGraph)
+ * - Navigation: navController.navigate(Screen.TrailDetail.createRoute(trailId))
+ * - Extraction paramètres: navBackStackEntry.arguments?.getString("trailId")
  */
+
 sealed class Screen(val route: String) {
     // Écrans d'authentification
     object Login : Screen("login_screen")

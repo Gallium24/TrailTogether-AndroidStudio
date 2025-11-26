@@ -22,6 +22,43 @@ import com.example.trailtogether_v01.data.viewmodel.NotificationsViewModel
 import com.example.trailtogether_v01.navigation.Screen
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * BottomNavBar.kt
+ *
+ * Barre de navigation inférieure principale de l'application.
+ *
+ * Fonctionnalités:
+ * - Navigation entre les écrans principaux (Home, Feed, Calendar, Profile)
+ * - Badge de notifications sur l'icône Feed
+ * - Indicateur de sélection (icône mise en surbrillance)
+ *
+ * Éléments de navigation:
+ * - Home: Icône carte (Map)
+ * - Feed: Icône feed (dynamicFeed) avec badge notifications
+ * - Calendar: Icône calendrier (DateRange)
+ * - Profile: Icône personne (Person)
+ *
+ * Badge notifications:
+ * - Affiché sur Feed si unreadCount > 0
+ * - Couleur rouge pour visibilité
+ * - Affiche le nombre exact si ≤ 99
+ * - Affiche "99+" si > 99
+ *
+ * Intégration NotificationViewModel:
+ * - Observe unreadCount via StateFlow
+ * - Met à jour automatiquement le badge
+ *
+ * Style:
+ * - Couleur de fond: NavBarBeige
+ * - Icône sélectionnée: TrailGreen
+ * - Icône non sélectionnée: Gris
+ *
+ * Utilisation:
+ * - Inclus dans le Scaffold de MainNavGraph
+ * - Visible sur écrans: Home, Feed, Calendar, Profile
+ * - Caché sur écrans de détails/création
+ */
+
 data class BottomNavItem(
     val route: String,
     val icon: ImageVector,

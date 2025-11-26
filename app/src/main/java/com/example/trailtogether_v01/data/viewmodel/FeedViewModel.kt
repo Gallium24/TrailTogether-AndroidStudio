@@ -16,11 +16,46 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * FeedViewModel est responsable de la logique du flux d'actualités (FeedScreen).
- * Ses principales responsabilités
- * - Charger les posts depuis le FirestoreRepository.
- * - Gérer les likes sur les posts.
- * - Exposer l'état des posts (posts) et du chargement (isLoading) que l'UI peut observer.
+ * FeedViewModel.kt
+ *
+ * Gère le fil d'actualité et les interactions avec les posts.
+ *
+ * Fonctionnalités:
+ * - Chargement du flux de posts (Flow réactif)
+ * - Création de nouveaux posts
+ * - Like/unlike des posts
+ * - Création de notifications pour les likes
+ * - Upload d'images (si implémenté)
+ *
+ * StateFlows exposés:
+ * - posts: Liste des posts du fil d'actualité
+ * - isLoading: Indicateur de chargement
+ *
+ * Méthodes:
+ * - loadPosts(): Charge le flux de posts depuis Firestore
+ * - createPost(...): Crée un nouveau post
+ *   - Paramètres: content, imageUrl, relatedTrailId (optionnel)
+ *   - Associe automatiquement l'auteur courant
+ * - likePost(postId): Like/unlike un post
+ *   - Toggle dans la liste likedBy
+ *   - Incrémente/décrémente likesCount
+ *   - Crée notification si nouveau like (pas pour son propre post)
+ *
+ * Logique de like:
+ * - Vérifie si l'utilisateur a déjà liké
+ * - Si non liké: ajoute à likedBy, crée notification
+ * - Si déjà liké: retire de likedBy
+ * - Met à jour le compteur likesCount
+ *
+ * Notifications:
+ * - Type: LIKE
+ * - Ne notifie pas l'auteur s'il like son propre post
+ * - Contient le nom du "likeur" et le début du post
+ *
+ * Utilisation:
+ * - Utilisé par FeedScreen et CreatePostScreen
+ * - Flow réactif: mises à jour automatiques des posts
+ * - PostCard utilise likePost() pour interactions
  */
 class FeedViewModel : ViewModel() {
     private val repository = FirestoreRepository()
@@ -97,7 +132,7 @@ class FeedViewModel : ViewModel() {
             return
         }
 
-        // Pour l'instant, on utilise le displayName de l'objet User de Firebase Auth
+        // on utilise le displayName de l'objet User de Firebase Auth
         val authorName = currentUser.displayName ?: "Utilisateur anonyme"
 
         val post = Post(

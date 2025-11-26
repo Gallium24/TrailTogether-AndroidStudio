@@ -33,11 +33,47 @@ import com.example.trailtogether_v01.ui.screens.calendar.CreateEventScreen
 import com.example.trailtogether_v01.ui.screens.notifications.NotificationsScreen
 import com.example.trailtogether_v01.ui.screens.settings.SettingsScreen
 
-
 /**
- * MainNavGraph est le graphe de navigation interne de l'application.
- * Il contient les écrans principaux de l'application (Home, Feed, Calendar, Profile).
+ * MainNavGraph.kt
+ *
+ * Définit le graphe de navigation principal de l'application (après authentification).
+ *
+ * Routes incluses:
+ * - HomeScreen: Carte et sentiers (route par défaut)
+ * - FeedScreen: Fil d'actualité
+ * - CalendarScreen: Calendrier d'événements
+ * - ProfileScreen: Profil de l'utilisateur
+ * - SettingsScreen: Paramètres
+ * - TrailDetailScreen: Détails d'un sentier
+ * - EventDetailScreen: Détails d'un événement
+ * - CreatePostScreen: Création de post
+ * - CreateEventScreen: Création d'événement
+ * - CommentsScreen: Commentaires d'un post
+ * - NotificationsScreen: Notifications
+ * - EditProfileScreen: Édition du profil
+ * - HistoryScreen: Historique des randonnées
+ * - UserProfileScreen: Profil d'un autre utilisateur
+ *
+ * Navigation:
+ * - BottomNavBar: HomeScreen, FeedScreen, CalendarScreen, ProfileScreen
+ * - Navigation interne: Détails, création, édition
+ *
+ * Passage de paramètres:
+ * - TrailDetailScreen: trailId (String)
+ * - EventDetailScreen: eventId (String)
+ * - CommentsScreen: postId (String)
+ * - UserProfileScreen: userId (String)
+ *
+ * Scaffold structure:
+ * - BottomNavBar présente sur écrans principaux
+ * - Cachée sur écrans de détails/création
+ *
+ * Utilisation:
+ * - Appelé par RootNavGraph quand authState est Success
+ * - Route de départ: Screen.Home
+ * - Nécessite authentification
  */
+
 @Composable
 fun MainNavGraph(navController: NavHostController, modifier: Modifier, onLogout: () -> Unit) {
     val homeViewModel: HomeViewModel = viewModel()

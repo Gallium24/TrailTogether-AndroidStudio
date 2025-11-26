@@ -24,11 +24,75 @@ import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
 /**
- * ProfileScreen est la composante de l'écran de profil.
- * @param onLogout Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Déconnexion".
- * @param onNavigateToEditProfile Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Modifier le profil".
- * @param profileViewModel Le ViewModel du profil.
+ * ProfileScreen.kt
+ *
+ * Écran du profil de l'utilisateur connecté.
+ *
+ * Fonctionnalités:
+ * - Affichage des informations du profil
+ * - Statistiques de randonnées
+ * - Accès à l'édition du profil
+ * - Accès à l'historique complet
+ * - Bouton de déconnexion
+ *
+ * Layout:
+ * 1. Header avec photo de profil:
+ *    - Photo circulaire (ou initiales si pas de photo)
+ *    - Nom de l'utilisateur
+ *    - Email
+ *
+ * 2. Bouton "Éditer le profil":
+ *    - Navigate vers EditProfileScreen
+ *    - Icône Edit
+ *
+ * 3. Bio:
+ *    - Affichée si renseignée
+ *    - Texte multiligne
+ *
+ * 4. Carte des statistiques:
+ *    - Nombre de randonnées effectuées
+ *    - Distance totale parcourue (formatée)
+ *    - Présentation en colonnes
+ *
+ * 5. Contact d'urgence:
+ *    - Affiché si configuré
+ *    - Icône téléphone
+ *    - Lien pour appeler (si sur téléphone)
+ *
+ * 6. Boutons d'action:
+ *    - "Voir l'historique" → HistoryScreen
+ *    - "Paramètres" → SettingsScreen
+ *    - "Se déconnecter" (couleur rouge)
+ *
+ * Affichage conditionnel:
+ * - Si pas de bio: Section masquée
+ * - Si pas de contact d'urgence: Section masquée
+ * - Si 0 randonnées: Message encourageant + bouton vers HomeScreen
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Données chargées: Affichage complet
+ * - Erreur: Message d'erreur
+ *
+ * Formatage:
+ * - Distance: km ou miles selon préférences
+ * - Statistiques: Nombres formatés (ex: "12,5 km")
+ *
+ * Déconnexion:
+ * - Dialogue de confirmation
+ * - Appel à AuthViewModel.signOut()
+ * - Navigation automatique vers AuthNavGraph
+ *
+ * Intégration:
+ * - ProfileViewModel pour données utilisateur
+ * - AuthViewModel pour déconnexion
+ * - Flow réactif du profil (mises à jour en temps réel)
+ *
+ * Utilisation:
+ * - Accessible via BottomNavBar (icône Profile)
+ * - Partie de MainNavGraph
  */
+
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit,

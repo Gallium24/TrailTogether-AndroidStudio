@@ -25,12 +25,52 @@ import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
 /**
- * LoginScreen est la composante de l'écran de connexion de l'utilisateur.
- * @param authState L'état d'authentification de l'utilisateur.
- * @param onLoginClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Se connecter".
- * @param onGoogleSignInClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Se connecter avec Google".
- * @param onNavigateToRegister Une fonction lambda appelée lorsque l'utilisateur clique sur le lien "Pas encore de compte ? S'inscrire".
+ * LoginScreen.kt
+ *
+ * Écran de connexion de l'application.
+ *
+ * Fonctionnalités:
+ * - Connexion avec email et mot de passe
+ * - Connexion avec Google Sign-In
+ * - Navigation vers RegisterScreen
+ * - Validation des champs
+ * - Gestion des erreurs d'authentification
+ *
+ * Champs:
+ * - Email: TextField avec validation
+ * - Mot de passe: TextField avec masquage
+ *
+ * Boutons:
+ * - "Se connecter": Connexion email/mot de passe
+ * - "Se connecter avec Google": Connexion Google
+ * - "Créer un compte": Navigation vers RegisterScreen
+ *
+ * Validation:
+ * - Email: Format valide requis
+ * - Mot de passe: Minimum 6 caractères
+ * - Messages d'erreur affichés sous les champs
+ *
+ * États:
+ * - Idle: Écran normal
+ * - Loading: Affichage CircularProgressIndicator
+ * - Success: Navigation automatique vers MainNavGraph
+ * - Error: Affichage du message d'erreur
+ *
+ * Intégration:
+ * - Observe authState de AuthViewModel
+ * - Appelle login() ou signInWithGoogle()
+ * - Firebase Authentication en arrière-plan
+ *
+ * Design:
+ * - Logo en haut
+ * - Formulaire centré
+ * - Couleurs du thème TrailTogether
+ *
+ * Utilisation:
+ * - Route par défaut de AuthNavGraph
+ * - Premier écran affiché si non connecté
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(

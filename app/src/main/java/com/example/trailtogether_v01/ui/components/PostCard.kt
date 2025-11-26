@@ -21,10 +21,49 @@ import com.example.trailtogether_v01.data.models.Post
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
 /**
- * PostCard est une composante qui représente une carte de publication.
- * @param post La publication à afficher.
- * @param onLikeClick Une fonction lambda appelée lorsque l'utilisateur appuie sur le bouton "Like".
+ * PostCard.kt
+ *
+ * Carte affichant un post du fil d'actualité.
+ *
+ * Informations affichées:
+ * - Nom de l'auteur (cliquable → UserProfileScreen)
+ * - Timestamp relatif (ex: "Il y a 2 heures")
+ * - Contenu textuel du post
+ * - Image (si présente)
+ * - Sentier lié (si présent, cliquable → TrailDetailScreen)
+ * - Compteur de likes avec bouton
+ * - Compteur de commentaires avec bouton
+ *
+ * Interactions:
+ * - Clic sur nom auteur → UserProfileScreen
+ * - Clic sur bouton like → Toggle like/unlike
+ * - Clic sur bouton commentaires → CommentsScreen
+ * - Clic sur nom sentier → TrailDetailScreen
+ *
+ * Indicateurs visuels:
+ * - Icône cœur rouge si utilisateur a liké
+ * - Icône cœur gris sinon
+ * - Compteurs likes et commentaires
+ *
+ * Design:
+ * - Card Material 3 avec élévation
+ * - Image en 16:9 si présente
+ * - Coins arrondis
+ * - Padding interne
+ *
+ * Paramètres:
+ * - post: Objet Post à afficher
+ * - currentUserId: ID utilisateur courant (pour vérifier si liké)
+ * - onLikeClick: Callback like/unlike
+ * - onCommentClick: Callback commentaires
+ * - onAuthorClick: Callback profil auteur
+ * - onTrailClick: Callback sentier lié (optionnel)
+ *
+ * Utilisation:
+ * - Utilisé dans FeedScreen (liste de posts)
+ * - Affiché dans LazyColumn avec espacement
  */
+
 @Composable
 fun PostCard(
     post: Post,

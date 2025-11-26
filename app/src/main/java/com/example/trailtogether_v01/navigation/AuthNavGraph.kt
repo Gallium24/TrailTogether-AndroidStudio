@@ -14,9 +14,29 @@ import com.example.trailtogether_v01.ui.screens.auth.LoginScreen
 import com.example.trailtogether_v01.ui.screens.auth.RegisterScreen
 
 /**
- * AuthNavGraph est le graphe de navigation interne de l'authentification.
- * Il contient les écrans de login et register.
+ * AuthNavGraph.kt
+ *
+ * Définit le graphe de navigation pour la partie authentification de l'application.
+ *
+ * Routes incluses:
+ * - LoginScreen: Écran de connexion (route par défaut)
+ * - RegisterScreen: Écran d'inscription
+ *
+ * Navigation:
+ * - Login → Register: Bouton "Créer un compte"
+ * - Register → Login: Bouton "Déjà un compte ?"
+ * - Login → MainNavGraph: Après connexion réussie (géré par RootNavGraph)
+ *
+ * Paramètres:
+ * - navController: NavHostController pour la navigation
+ * - authViewModel: ViewModel d'authentification (partagé avec RootNavGraph)
+ *
+ * Utilisation:
+ * - Appelé par RootNavGraph quand authState n'est pas Success
+ * - Route de départ: Screen.Login
+ * - Écrans non authentifiés uniquement
  */
+
 @Composable
 fun AuthNavGraph(
     navController: NavHostController,

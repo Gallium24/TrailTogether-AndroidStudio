@@ -13,13 +13,37 @@ import com.example.trailtogether_v01.data.viewmodel.HomeViewModel
 import com.example.trailtogether_v01.ui.components.BottomNavBar
 import org.osmdroid.util.GeoPoint
 
-
 /**
- * RootNavGraph est le graphe de navigation racine de l'application.
- * Il agit comme un aiguillage en fonction de l'état de connexion de l'utilisateur :
- * - Si l'utilisateur est connecté, il affiche MainScreen (qui a sa propre navigation interne).
- * - Sinon, il affiche AuthNavGraph (pour la connexion/inscription).
+ * RootNavGraph.kt
+ *
+ * Graphe de navigation racine de l'application.
+ * Détermine quel graphe afficher selon l'état d'authentification.
+ *
+ * Responsabilités:
+ * - Décision Auth vs Main graph selon authState
+ * - Initialisation de la position GPS initiale
+ * - Gestion du state hoisting pour HomeViewModel
+ *
+ * Logique:
+ * - Si authState est Success: Affiche MainNavGraph
+ * - Sinon: Affiche AuthNavGraph
+ *
+ * Paramètres:
+ * - authViewModel: ViewModel d'authentification (partagé)
+ * - authState: État d'authentification courant
+ * - navController: NavHostController racine
+ * - initialLocation: Position GPS initiale (optionnel)
+ *
+ * Gestion de la position:
+ * - Reçoit initialLocation depuis MainActivity
+ * - Transmet à HomeViewModel via setInitialLocation()
+ * - Déclenche le chargement initial des sentiers
+ *
+ * Utilisation:
+ * - Point d'entrée de la navigation depuis MainActivity
+ * - Crée le NavHost racine avec routes conditionnelles
  */
+
 @Composable
 fun RootNavGraph(
     authViewModel: AuthViewModel = viewModel(),

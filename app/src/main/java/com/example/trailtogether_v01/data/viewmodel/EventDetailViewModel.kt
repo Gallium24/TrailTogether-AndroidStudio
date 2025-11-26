@@ -14,6 +14,42 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * EventDetailViewModel.kt
+ *
+ * Gère les détails d'un événement et la gestion des participants.
+ *
+ * Fonctionnalités:
+ * - Chargement des détails d'un événement
+ * - Inscription/désinscription à un événement
+ * - Vérification si l'utilisateur est déjà inscrit
+ * - Vérification du statut de l'événement (complet/places disponibles)
+ *
+ * StateFlows exposés:
+ * - event: Détails de l'événement actuel
+ * - isLoading: Indicateur de chargement
+ *
+ * Méthodes:
+ * - loadEvent(eventId): Charge un événement spécifique
+ * - registerForEvent(userId): Inscrit l'utilisateur courant
+ * - unregisterFromEvent(userId): Désinscrit l'utilisateur courant
+ * - isUserRegistered(userId): Vérifie si l'utilisateur est inscrit
+ *
+ * Logique d'inscription:
+ * - Vérifie si l'événement n'est pas complet (participants < maxParticipants)
+ * - Vérifie si l'utilisateur n'est pas déjà inscrit
+ * - Met à jour la liste des participants dans Firestore
+ *
+ * Gestion du cache:
+ * - Met à jour le state local après inscription/désinscription
+ * - Pas besoin de recharger depuis Firestore
+ *
+ * Utilisation:
+ * - Utilisé par EventDetailScreen
+ * - Affiche les détails de l'événement et la liste des participants
+ * - Bouton d'inscription/désinscription dynamique
+ */
+
 class EventDetailViewModel : ViewModel() {
     private val repository = FirestoreRepository()
 

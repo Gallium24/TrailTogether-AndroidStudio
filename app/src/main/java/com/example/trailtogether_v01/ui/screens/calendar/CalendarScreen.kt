@@ -30,6 +30,53 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
+/**
+ * CalendarScreen.kt
+ *
+ * Écran du calendrier affichant les événements de randonnée.
+ *
+ * Fonctionnalités:
+ * - Affichage du mois courant avec navigation mois précédent/suivant
+ * - Liste des événements du mois sélectionné
+ * - Bouton pour créer un nouvel événement
+ * - Filtrage automatique des événements par mois
+ *
+ * Layout:
+ * - Header: Mois/Année avec flèches navigation
+ * - Liste: EventCard pour chaque événement du mois
+ * - FloatingActionButton: Création d'événement
+ *
+ * Navigation:
+ * - Clic sur EventCard → EventDetailScreen
+ * - Clic sur FAB → HomeScreen (pour sélectionner un sentier)
+ * - Flèches → Mois précédent/suivant
+ *
+ * Filtrage:
+ * - Événements filtrés par mois et année
+ * - Tri par date (plus proches en premier)
+ * - Message si aucun événement dans le mois
+ *
+ * États:
+ * - isLoading: Affiche CircularProgressIndicator
+ * - Liste vide: "Aucun événement ce mois-ci"
+ * - Avec événements: Liste scrollable
+ *
+ * Intégration:
+ * - CalendarViewModel pour logique et données
+ * - Flow réactif des événements
+ * - Mises à jour automatiques
+ *
+ * Design:
+ * - LazyColumn pour la liste
+ * - Espacement entre cards (12.dp)
+ * - FAB en bas à droite
+ * - Couleurs du thème
+ *
+ * Utilisation:
+ * - Accessible via BottomNavBar (icône Calendar)
+ * - Partie de MainNavGraph
+ */
+
 @Composable
 fun CalendarScreen(
     onNavigateToEventDetail: (String) -> Unit,
@@ -89,7 +136,6 @@ fun CalendarScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Grille des jours
-                // Note : Logique simplifiée pour générer les jours du mois
                 val daysInMonth = selectedDate.lengthOfMonth()
                 val firstDayOfMonth = selectedDate.withDayOfMonth(1).dayOfWeek.value % 7 // Dimanche = 0 ou 7 selon config
 

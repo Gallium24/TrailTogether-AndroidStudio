@@ -12,6 +12,46 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * UserProfileViewModel.kt
+ *
+ * Gère l'affichage du profil d'un autre utilisateur (vue publique).
+ *
+ * Fonctionnalités:
+ * - Chargement du profil d'un utilisateur spécifique
+ * - Affichage des informations publiques
+ * - Affichage des statistiques
+ * - Pas d'édition (lecture seule)
+ *
+ * StateFlows exposés:
+ * - user: Informations de l'utilisateur affiché
+ * - isLoading: Indicateur de chargement
+ *
+ * Méthodes:
+ * - loadUserProfile(userId): Charge le profil par ID
+ *
+ * Différence avec ProfileViewModel:
+ * - UserProfileViewModel: Vue publique d'un autre utilisateur (lecture seule)
+ * - ProfileViewModel: Profil de l'utilisateur connecté (éditable)
+ *
+ * Informations affichées:
+ * - Nom et photo de profil
+ * - Bio (si définie)
+ * - Statistiques publiques:
+ *   - Nombre de randonnées
+ *   - Distance totale parcourue
+ *
+ * Informations masquées:
+ * - Contact d'urgence (privé)
+ * - Email (privé)
+ * - Historique détaillé (privé)
+ *
+ * Utilisation:
+ * - Utilisé par UserProfileScreen
+ * - Navigation depuis un post (clic sur nom d'auteur)
+ * - Navigation depuis liste de participants d'un événement
+ */
+
 class UserProfileViewModel : ViewModel() {
     private val repository = FirestoreRepository()
     private val auth = Firebase.auth

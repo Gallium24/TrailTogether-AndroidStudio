@@ -23,6 +23,70 @@ import com.example.trailtogether_v01.data.viewmodel.NotificationsViewModel
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * NotificationsScreen.kt
+ *
+ * Écran affichant toutes les notifications de l'utilisateur.
+ *
+ * Fonctionnalités:
+ * - Liste des notifications (likes, commentaires)
+ * - Distinction visuelle lues/non lues
+ * - Marquage comme lu au clic
+ * - Navigation vers le post concerné
+ * - Bouton "Tout marquer comme lu"
+ *
+ * Layout:
+ * 1. Header:
+ *    - Titre "Notifications"
+ *    - Bouton retour
+ *    - Bouton "Tout marquer comme lu"
+ *
+ * 2. Liste de notifications:
+ *    - Card pour chaque notification
+ *    - Icône selon type:
+ *      - LIKE: ❤️ Cœur rouge
+ *      - COMMENT: 💬 Bulle de commentaire verte
+ *    - Nom de l'expéditeur
+ *    - Contenu de la notification
+ *    - Timestamp relatif
+ *
+ * Distinction lues/non lues:
+ * - Non lues: Background vert clair + badge vert
+ * - Lues: Background blanc/gris clair
+ *
+ * Interactions:
+ * - Clic sur notification:
+ *   1. Marque comme lue
+ *   2. Navigate vers le post concerné (FeedScreen)
+ * - Clic sur "Tout marquer comme lu":
+ *   - Marque toutes les notifications comme lues
+ *   - Reset du badge sur BottomNavBar
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Liste vide: "Aucune notification"
+ * - Avec notifications: LazyColumn scrollable
+ *
+ * Tri:
+ * - Par timestamp décroissant (plus récentes en premier)
+ * - Mises à jour en temps réel via Flow
+ *
+ * Badge:
+ * - Compte des notifications non lues
+ * - Affiché sur BottomNavBar (icône Feed)
+ * - Format: nombre exact ou "99+"
+ *
+ * Intégration:
+ * - NotificationViewModel pour données et logique
+ * - Flow réactif des notifications
+ * - Mise à jour automatique du badge
+ *
+ * Utilisation:
+ * - Navigation depuis FeedScreen (clic sur icône notifications)
+ * - Accessible aussi via BottomNavBar si implémenté
+ * - Partie de MainNavGraph
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(

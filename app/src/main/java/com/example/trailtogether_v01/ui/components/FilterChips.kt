@@ -11,6 +11,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.trailtogether_v01.data.models.Difficulty
 
+/**
+ * FilterChips.kt
+ *
+ * Composant DifficultyFilterChips pour filtrer les sentiers par difficulté.
+ *
+ * Fonctionnalités:
+ * - Affichage de chips cliquables pour chaque niveau de difficulté
+ * - Sélection/désélection d'un niveau
+ * - Indicateur visuel de sélection
+ *
+ * Niveaux de difficulté:
+ * - EASY (Facile): 🟢 Vert
+ * - MODERATE (Modéré): 🟠 Orange
+ * - HARD (Difficile): 🟠 Orange foncé
+ * - EXPERT (Expert): 🔴 Rouge
+ *
+ * Comportement:
+ * - Clic sur chip sélectionnée: Désélectionne (affiche tous les niveaux)
+ * - Clic sur chip non sélectionnée: Sélectionne ce niveau uniquement
+ * - Une seule sélection à la fois
+ *
+ * Design:
+ * - Chips Material 3 avec emoji et texte
+ * - Chip sélectionnée: Couleur de fond appropriée
+ * - Chip non sélectionnée: Fond gris clair
+ * - Disposition horizontale avec espacement
+ *
+ * Paramètres:
+ * - selectedDifficulty: Difficulté actuellement sélectionnée (null = toutes)
+ * - onDifficultySelected: Callback lors de la sélection
+ *
+ * Utilisation:
+ * - Utilisé dans HomeScreen au-dessus de la liste de sentiers
+ * - Mis à jour via HomeViewModel.setDifficultyFilter()
+ * - Filtre automatiquement la liste filteredTrails
+ */
+
 @Composable
 fun DifficultyFilterChips(
     selectedDifficulty: Difficulty?,

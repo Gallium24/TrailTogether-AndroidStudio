@@ -10,12 +10,44 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ProfileViewModel est responsable de la logique du profil de l'utilisateur.
- * Ses principales responsabilités sont :
- * - Charger les détails du profil de l'utilisateur depuis le FirestoreRepository.
- * - Mettre à jour les informations du profil de l'utilisateur dans le FirestoreRepository.
- * - Exposer l'état du profil (user) et du chargement (isLoading) que l'UI peut observer.
+ * ProfileViewModel.kt
+ *
+ * Gère le profil de l'utilisateur connecté.
+ *
+ * Fonctionnalités:
+ * - Chargement des informations du profil
+ * - Mise à jour du profil (nom, bio, contact d'urgence)
+ * - Upload de photo de profil
+ * - Affichage des statistiques (randonnées, distance)
+ * - Gestion de l'historique de randonnées
+ *
+ * StateFlows exposés:
+ * - user: Informations de l'utilisateur courant
+ * - isLoading: Indicateur de chargement
+ * - errorMessage: Message d'erreur si échec
+ *
+ * Méthodes:
+ * - loadUserProfile(userId): Charge le profil complet
+ * - updateProfile(name, bio, emergencyContact): Met à jour les infos
+ * - uploadProfilePicture(uri): Upload nouvelle photo (si implémenté)
+ * - addToHistory(trail): Ajoute une randonnée à l'historique
+ *
+ * Statistiques:
+ * - trailsCompleted: Nombre de randonnées effectuées
+ * - totalDistance: Distance totale parcourue (km)
+ * - Mises à jour automatiques lors de l'ajout à l'historique
+ *
+ * Validation:
+ * - Vérification format email pour contact d'urgence (optionnel)
+ * - Vérification format téléphone (optionnel)
+ * - Limite de caractères pour bio
+ *
+ * Utilisation:
+ * - Utilisé par ProfileScreen et EditProfileScreen
+ * - Charge automatiquement le profil au démarrage
+ * - Mises à jour en temps réel via Flow Firestore
  */
+
 class ProfileViewModel : ViewModel() {
     private val repository = FirestoreRepository()
 

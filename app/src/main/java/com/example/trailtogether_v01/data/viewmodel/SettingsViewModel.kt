@@ -9,6 +9,51 @@ import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.modules.SqlTileWriter
 import android.widget.Toast
 
+/**
+ * SettingsViewModel.kt
+ *
+ * Gère les paramètres de l'application via SettingsManager.
+ *
+ * Fonctionnalités:
+ * - Mode sombre/clair
+ * - Unités de mesure (métriques/impériales)
+ * - Rayon de recherche des sentiers (1-100 km)
+ * - Style de carte (Mapnik, OpenTopoMap, etc.)
+ * - Affichage des tracés de sentiers
+ * - Contact d'urgence
+ *
+ * StateFlows exposés:
+ * - isDarkMode: État du mode sombre
+ * - useImperialUnits: Unités impériales activées
+ * - defaultRadiusKm: Rayon de recherche par défaut
+ * - mapStyle: Style de carte sélectionné
+ * - showTrailPath: Afficher tracés des sentiers
+ *
+ * Méthodes:
+ * - toggleDarkMode(): Bascule le mode sombre
+ * - setImperialUnits(enabled): Active/désactive unités impériales
+ * - setDefaultRadius(radius): Définit le rayon de recherche
+ * - setMapStyle(style): Change le style de carte
+ * - toggleTrailPath(): Bascule affichage des tracés
+ *
+ * Persistence:
+ * - Utilise SettingsManager (DataStore Preferences)
+ * - Paramètres sauvegardés localement
+ * - Chargés automatiquement au démarrage
+ * - Survivent à la fermeture de l'app
+ *
+ * Impact des paramètres:
+ * - Mode sombre: Appliqué via Theme.kt
+ * - Unités impériales: Conversion km → miles dans FormatUtils
+ * - Rayon recherche: Utilisé par HomeViewModel pour loadMapTrails()
+ * - Style carte: Appliqué dans HomeScreen (TileSource)
+ * - Tracés: Affichage des Polylines sur la carte
+ *
+ * Utilisation:
+ * - Utilisé par SettingsScreen
+ * - États observés par divers composants (Theme, HomeScreen, TrailCard)
+ */
+
 data class SettingsUiState(
     val isDarkMode: Boolean = false,
     val useImperialUnits: Boolean = false,

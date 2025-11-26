@@ -16,6 +16,60 @@ import org.osmdroid.util.GeoPoint
 import android.util.Log
 import kotlinx.coroutines.delay
 
+/**
+ * HomeViewModel.kt
+ *
+ * Gère l'écran d'accueil : carte interactive, liste des sentiers, filtres et recherche.
+ *
+ * Fonctionnalités:
+ * - Chargement des sentiers Firestore (custom)
+ * - Chargement des sentiers OpenStreetMap (dynamique par zone)
+ * - Filtrage par difficulté (EASY, MODERATE, HARD, EXPERT)
+ * - Recherche par nom ou localisation
+ * - Gestion de la position et du zoom de la carte
+ * - Sélection d'un sentier sur la carte
+ * - Calcul des statistiques (nombre sentiers, distance totale, dénivelé)
+ *
+ * StateFlows exposés:
+ * - allTrails: Tous les sentiers (Firestore + OSM combinés)
+ * - filteredTrails: Sentiers après filtres et recherche
+ * - selectedDifficulty: Filtre de difficulté actuel
+ * - searchQuery: Texte de recherche
+ * - selectedTrail: Sentier sélectionné sur la carte
+ * - isLoadingMapTrails: Indicateur de chargement OSM
+ * - errorMessage: Message d'erreur si échec chargement
+ * - trailStats: Statistiques des sentiers (TrailStats)
+ * - mapCenter: Centre de la carte (GeoPoint)
+ * - mapZoom: Niveau de zoom
+ * - showTrailPath: Afficher/masquer les tracés
+ *
+ * Méthodes principales:
+ * - setInitialLocation(location): Définit position GPS initiale et charge sentiers
+ * - loadMapTrails(center, radius, useGeocoding): Charge sentiers OSM autour d'une position
+ * - refreshTrailsWithRadius(center, radius): Recharge sentiers avec nouveau rayon
+ * - setDifficultyFilter(difficulty): Applique filtre de difficulté
+ * - setSearchQuery(query): Applique recherche textuelle
+ * - selectTrail(trailId): Sélectionne un sentier (affiche card sur carte)
+ * - clearSelectedTrail(): Désélectionne le sentier
+ * - updateMapPosition(center, zoom): Met à jour position/zoom carte
+ * - toggleShowTrailPath(): Toggle affichage des tracés
+ *
+ * Logique de filtrage:
+ * - Combine filtres de difficulté, recherche textuelle
+ * - Recherche dans nom et localisation (insensible à la casse)
+ * - Flux réactif : résultats mis à jour automatiquement
+ *
+ * Optimisations:
+ * - Cache des sentiers OSM par position et rayon
+ * - Premier chargement sans message d'erreur (flag isInitialLoad)
+ * - Limite 20 sentiers OSM par zone
+ * - SavedStateHandle pour persistance position/zoom lors de configuration changes
+ *
+ * Utilisation:
+ * - Utilisé par HomeScreen
+ * - Coordonne carte OSMDroid, liste de sentiers, filtres, recherche
+ */
+
 class HomeViewModel(
     private val savedStateHandle: SavedStateHandle = SavedStateHandle()
 ) : ViewModel() {
@@ -103,8 +157,6 @@ class HomeViewModel(
         _allTrails.value = firestoreTrails + osmTrails
 
         updateStats()
-
-        Log.d("HomeViewModel", "📊 Total: ${_allTrails.value.size} trails (Firestore: ${firestoreTrails.size}, OSM: ${osmTrails.size})")
     }
 
     private fun updateStats() {

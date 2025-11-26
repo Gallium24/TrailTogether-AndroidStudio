@@ -10,9 +10,49 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 /**
- * Service de géocodage inversé pour convertir des coordonnées GPS en adresses lisibles.
- * Utilise l'API Nominatim d'OpenStreetMap (gratuite, respecte les limites d'utilisation).
+ * GeoCodingService.kt
+ *
+ * Service de géocodage inversé convertissant des coordonnées GPS en adresses lisibles.
+ * Utilise l'API Nominatim d'OpenStreetMap (gratuite, limite 1 req/sec).
+ *
+ * Fonctionnalités:
+ * - Conversion coordonnées GPS → adresse textuelle
+ * - Priorisation des lieux naturels (parcs, forêts) pour les sentiers
+ * - Système de cache pour éviter les appels API redondants
+ * - Respect des limitations API (1 requête/seconde)
+ *
+ * Méthode principale:
+ * - getAddressFromCoordinates(lat, lon): Retourne l'adresse formatée
+ *   - Vérifie le cache d'abord
+ *   - Appelle API Nominatim si nécessaire
+ *   - Construit adresse intelligente selon priorités
+ *   - Met en cache le résultat
+ *
+ * Priorités d'adresse:
+ * 1. Lieux naturels: parcs, forêts, sommets, zones de loisirs
+ * 2. Localités: villages, villes, municipalités
+ * 3. Régions: départements, provinces, états
+ * 4. Fallback: display_name simplifié
+ *
+ * GeocodingCache:
+ * - Cache simple en mémoire (mutableMap)
+ * - Clé: coordonnées arrondies à 3 décimales (~100m précision)
+ * - Regroupe sentiers proches sous même adresse
+ * - Méthodes: get(), put(), clear(), size()
+ *
+ * Configuration requise:
+ * - User-Agent: "TrailTogetherApp/1.0" (requis par Nominatim)
+ * - Délai minimum 1.1s entre requêtes (géré par appelant)
+ *
+ * Utilisation:
+ * - Appelé par CompleteTrailRepository lors de l'enrichissement des sentiers
+ * - Optionnel (peut être désactivé pour performances)
+ * - Cache persiste pendant la session de l'app
+ *
+ * Note: Géocodage optionnel désactivé par défaut pour chargement rapide.
+ * Alternative: Affichage de coordonnées formatées (ex: "48.4284°N, -71.0598°O")
  */
+
 object GeocodingService {
 
     private val client = HttpClient(Android)

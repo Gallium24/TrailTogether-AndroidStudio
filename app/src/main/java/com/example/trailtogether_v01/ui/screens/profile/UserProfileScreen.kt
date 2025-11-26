@@ -23,6 +23,76 @@ import com.example.trailtogether_v01.ui.components.PostCard
 import com.example.trailtogether_v01.ui.theme.BackgroundBeige
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
+/**
+ * UserProfileScreen.kt
+ *
+ * Écran affichant le profil public d'un autre utilisateur (lecture seule).
+ *
+ * Fonctionnalités:
+ * - Affichage des informations publiques
+ * - Statistiques de randonnées (publiques)
+ * - Pas d'édition (vue lecture seule)
+ *
+ * Informations affichées:
+ * - Photo de profil (ou initiales)
+ * - Nom de l'utilisateur
+ * - Bio (si renseignée et publique)
+ * - Statistiques:
+ *   - Nombre de randonnées
+ *   - Distance totale parcourue
+ *
+ * Informations masquées (privées):
+ * - Email
+ * - Contact d'urgence
+ * - Historique détaillé
+ *
+ * Layout:
+ * 1. Header:
+ *    - Bouton retour
+ *    - Titre "Profil"
+ *
+ * 2. Section profil:
+ *    - Photo circulaire
+ *    - Nom (grand titre)
+ *    - Bio (si disponible)
+ *
+ * 3. Statistiques publiques:
+ *    - Carte avec stats
+ *    - Présentation en colonnes
+ *
+ * 4. Actions possibles (futures):
+ *    - Suivre l'utilisateur
+ *    - Voir les posts de l'utilisateur
+ *    - Envoyer un message
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Utilisateur chargé: Affichage complet
+ * - Utilisateur introuvable: Message d'erreur + bouton retour
+ *
+ * Différences avec ProfileScreen:
+ * - Pas de bouton "Éditer"
+ * - Pas de bouton "Déconnexion"
+ * - Pas d'informations privées
+ * - Pas d'accès à l'historique complet
+ *
+ * Navigation:
+ * - Depuis FeedScreen (clic sur auteur de post)
+ * - Depuis CommentsScreen (clic sur auteur de commentaire)
+ * - Depuis EventDetailScreen (clic sur participant)
+ *
+ * Paramètre:
+ * - userId: ID de l'utilisateur à afficher
+ *
+ * Intégration:
+ * - UserProfileViewModel pour chargement des données
+ * - Données chargées depuis Firestore par userId
+ *
+ * Utilisation:
+ * - Partie de MainNavGraph avec paramètre userId
+ * - Route: "user_profile/{userId}"
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(

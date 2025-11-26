@@ -18,6 +18,44 @@ import org.json.JSONObject
 import org.osmdroid.util.GeoPoint
 import kotlin.math.abs
 
+/**
+ * CompleteTrailRepository.kt
+ *
+ * Repository gérant la récupération et l'enrichissement des sentiers depuis OpenStreetMap.
+ *
+ * Fonctionnalités:
+ * - Requêtes à l'API Overpass pour récupérer les sentiers de randonnée
+ * - Enrichissement des données: calcul distance, dénivelé, difficulté, durée estimée
+ * - Géocodage inversé optionnel (coordonnées → adresses)
+ * - Système de cache pour optimiser les performances (par position et rayon)
+ * - Filtrage automatique (exclut routes, ponts, parkings)
+ * - Limitation à 20 sentiers par zone pour éviter la surcharge
+ *
+ * Structure RawOverpassTrail:
+ * - Représentation temporaire des données brutes d'Overpass avant enrichissement
+ *
+ * Méthodes principales:
+ * - getEnrichedTrails(): Récupère et enrichit les sentiers pour une zone donnée
+ *   - useGeocoding: Boolean (false par défaut pour performances optimales)
+ * - geocodeTrail(): Géocode un sentier spécifique de manière asynchrone
+ * - clearCache(): Vide le cache local de sentiers
+ *
+ * Optimisations:
+ * - Cache local par clé (lat, lon, rayon)
+ * - Géocodage optionnel (désactivé par défaut: 10× plus rapide)
+ * - Sampling des points pour calcul d'élévation (max 10 points)
+ * - API open-elevation.com pour données de dénivelé
+ *
+ * APIs utilisées:
+ * - Overpass API: Récupération sentiers OSM
+ * - Open-Elevation API: Calcul dénivelé
+ * - GeocodingService: Conversion coordonnées → adresses
+ *
+ * Utilisation:
+ * - Appelé par HomeViewModel pour charger sentiers autour d'une position
+ * - Cache automatique pour réduire les requêtes réseau
+ */
+
 class CompleteTrailRepository {
 
     private val client = HttpClient(Android)
@@ -65,10 +103,8 @@ class CompleteTrailRepository {
             // Mettre en cache
             trailCache[cacheKey] = enrichedTrails
 
-            Log.d("CompleteTrailRepo", "✅ ${enrichedTrails.size} sentiers chargés")
             Result.success(enrichedTrails)
         } catch (e: Exception) {
-            Log.e("CompleteTrailRepo", "❌ Erreur", e)
             Result.failure(e)
         }
     }

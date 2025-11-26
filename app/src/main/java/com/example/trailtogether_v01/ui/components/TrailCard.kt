@@ -22,6 +22,49 @@ import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
 import com.example.trailtogether_v01.utils.FormatUtils
 
+/**
+ * TrailCard.kt
+ *
+ * Carte affichant les informations d'un sentier dans une liste.
+ *
+ * Informations affichées:
+ * - Nom du sentier
+ * - Localisation (adresse ou coordonnées)
+ * - Distance (formatée en km ou miles selon préférences)
+ * - Durée estimée
+ * - Badge de difficulté avec couleur
+ * - Rating et nombre d'avis (pour sentiers Firestore)
+ * - Dénivelé (pour sentiers OSM)
+ *
+ * Design:
+ * - Card Material 3 avec élévation légère
+ * - Coins arrondis (16.dp)
+ * - Padding interne
+ * - Disposition en colonne
+ * - Icônes pour chaque information
+ *
+ * Badge de difficulté:
+ * - EASY: Vert (#4CAF50)
+ * - MODERATE: Jaune (#FFC107)
+ * - HARD: Orange (#FF9800)
+ * - EXPERT: Rouge (#F44336)
+ *
+ * Formatage distance:
+ * - Utilise FormatUtils.formatDistance()
+ * - Affiche en km ou miles selon useImperialUnits
+ * - Format: "X.XX km" ou "X.XX mi"
+ *
+ * Paramètres:
+ * - trail: Objet Trail à afficher
+ * - onClick: Action lors du clic (→ TrailDetailScreen)
+ * - useImperialUnits: Boolean pour unités (false = km, true = miles)
+ *
+ * Utilisation:
+ * - Utilisé dans HomeScreen (liste de sentiers)
+ * - Affiché dans LazyColumn avec espacement (12.dp)
+ */
+
+
 @Composable
 fun TrailCard(
     trail: Trail,

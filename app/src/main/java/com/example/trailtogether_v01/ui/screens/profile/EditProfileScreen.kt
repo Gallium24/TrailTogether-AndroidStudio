@@ -27,12 +27,66 @@ import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Email
 
-
 /**
- * EditProfileScreen est la composante de l'écran de modification du profil.
- * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
- * @param profileViewModel Le ViewModel du profil.
+ * EditProfileScreen.kt
+ *
+ * Écran d'édition du profil utilisateur.
+ *
+ * Fonctionnalités:
+ * - Modification du nom
+ * - Modification de la bio
+ * - Modification du contact d'urgence
+ * - Upload de photo de profil
+ * - Validation des champs
+ * - Sauvegarde des modifications
+ *
+ * Champs éditables:
+ * - Nom: TextField (requis)
+ * - Bio: TextField multilignes (optionnel, max 200 caractères)
+ * - Contact d'urgence: TextField avec validation téléphone (optionnel)
+ * - Photo de profil: Sélection depuis galerie
+ *
+ * Validation:
+ * - Nom: Minimum 2 caractères, requis
+ * - Bio: Maximum 200 caractères
+ * - Contact: Format téléphone valide (si renseigné)
+ *
+ * Boutons:
+ * - "Sauvegarder": Enregistre les modifications
+ * - "Annuler": Retour sans sauvegarder (avec confirmation si changements)
+ * - "Changer la photo": Ouvre sélecteur de galerie
+ *
+ * Aperçu photo:
+ * - Affiche photo actuelle ou placeholder
+ * - Preview de la nouvelle photo avant sauvegarde
+ * - Option de retirer la photo
+ *
+ * Process de sauvegarde:
+ * 1. Validation des champs
+ * 2. Upload de la photo (si changée)
+ * 3. Mise à jour du profil dans Firestore
+ * 4. Affichage message de succès
+ * 5. Navigation vers ProfileScreen
+ *
+ * États:
+ * - Idle: Formulaire actif
+ * - Loading: Sauvegarde en cours (CircularProgressIndicator)
+ * - Success: Message de succès + navigation
+ * - Error: Message d'erreur affiché
+ *
+ * Pré-remplissage:
+ * - Tous les champs sont pré-remplis avec valeurs actuelles
+ * - Chargés depuis ProfileViewModel
+ *
+ * Intégration:
+ * - ProfileViewModel pour chargement et sauvegarde
+ * - Firebase Storage pour upload photo (si implémenté)
+ *
+ * Utilisation:
+ * - Navigation depuis ProfileScreen (bouton "Éditer le profil")
+ * - Partie de MainNavGraph
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(

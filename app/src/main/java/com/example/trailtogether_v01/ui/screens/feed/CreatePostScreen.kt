@@ -12,10 +12,56 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trailtogether_v01.data.viewmodel.FeedViewModel
 
 /**
- * CreatePostScreen est la composante de l'écran de création de publication.
- * @param onNavigateBack Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "Retour".
- * @param feedViewModel Le ViewModel de la publication.
+ * CreatePostScreen.kt
+ *
+ * Écran de création d'un nouveau post pour le fil d'actualité.
+ *
+ * Fonctionnalités:
+ * - Saisie du contenu textuel
+ * - Upload d'image (optionnel)
+ * - Lien vers un sentier (optionnel)
+ * - Aperçu avant publication
+ * - Validation du contenu
+ *
+ * Champs:
+ * - Contenu: TextField multilignes (requis)
+ * - Image: Sélection depuis galerie (optionnel)
+ * - Sentier lié: Dropdown ou recherche (optionnel)
+ *
+ * Validation:
+ * - Contenu: Minimum 1 caractère, maximum 1000
+ * - Image: Formats acceptés JPG, PNG (si implémenté)
+ * - Taille max image: 5 MB (si implémenté)
+ *
+ * Boutons:
+ * - "Publier": Crée le post et retourne au FeedScreen
+ * - "Annuler": Retour sans sauvegarder (avec confirmation si contenu)
+ * - "Ajouter une image": Ouvre le sélecteur de galerie
+ *
+ * Process de publication:
+ * 1. Validation du contenu
+ * 2. Upload de l'image (si présente)
+ * 3. Création de l'objet Post
+ * 4. Sauvegarde dans Firestore via FeedViewModel
+ * 5. Navigation vers FeedScreen
+ *
+ * Preview:
+ * - Aperçu de l'image sélectionnée
+ * - Option de retirer l'image
+ * - Aperçu du sentier lié (si sélectionné)
+ *
+ * États:
+ * - Idle: Formulaire actif
+ * - Loading: Upload en cours (CircularProgressIndicator)
+ * - Success: Navigation automatique vers FeedScreen
+ * - Error: Message d'erreur affiché
+ *
+ * Utilisation:
+ * - Navigation depuis FeedScreen (FAB)
+ * - Navigation depuis TrailDetailScreen (partager expérience)
+ * - Partie de MainNavGraph
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePostScreen(

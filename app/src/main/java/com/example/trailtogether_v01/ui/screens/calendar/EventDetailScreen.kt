@@ -36,6 +36,55 @@ import java.util.concurrent.TimeUnit
 import com.example.trailtogether_v01.workers.EmergencyWorker
 import android.widget.Toast
 
+/**
+ * EventDetailScreen.kt
+ *
+ * Écran affichant les détails d'un événement et gérant les inscriptions.
+ *
+ * Fonctionnalités:
+ * - Affichage complet des informations de l'événement
+ * - Liste des participants inscrits
+ * - Inscription/désinscription à l'événement
+ * - Navigation vers le sentier associé
+ * - Vérification des places disponibles
+ *
+ * Informations affichées:
+ * - Nom de l'événement
+ * - Sentier associé (cliquable → TrailDetailScreen)
+ * - Date et heure
+ * - Organisateur
+ * - Description
+ * - Nombre de participants / maximum
+ * - Liste des participants avec noms
+ *
+ * Boutons:
+ * - "S'inscrire": Si pas inscrit et places disponibles
+ * - "Se désinscrire": Si déjà inscrit
+ * - "Complet": Si nombre maximum atteint (désactivé)
+ *
+ * États:
+ * - isLoading: CircularProgressIndicator
+ * - Inscrit: Bouton "Se désinscrire" (couleur différente)
+ * - Non inscrit: Bouton "S'inscrire"
+ * - Complet: Bouton désactivé avec message
+ *
+ * Logique d'inscription:
+ * - Vérifie si l'utilisateur est déjà inscrit
+ * - Vérifie si places disponibles
+ * - Met à jour la liste des participants
+ * - Mise à jour immédiate de l'UI
+ *
+ * Liste des participants:
+ * - Affichage des noms
+ * - Badge "Organisateur" pour l'organisateur
+ * - Scrollable si nombreux participants
+ *
+ * Utilisation:
+ * - Navigation depuis CalendarScreen (clic sur EventCard)
+ * - Navigation depuis HomeScreen (événements à venir)
+ * - Partie de MainNavGraph avec paramètre eventId
+ */
+
 @Composable
 fun EventDetailScreen(
     eventId: String,

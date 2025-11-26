@@ -11,6 +11,40 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * CalendarViewModel.kt
+ *
+ * Gère l'état du calendrier des événements de randonnée.
+ *
+ * Fonctionnalités:
+ * - Chargement de tous les événements depuis Firestore
+ * - Filtrage des événements par mois sélectionné
+ * - Navigation entre les mois (précédent/suivant)
+ * - Rechargement manuel des événements
+ *
+ * StateFlows exposés:
+ * - events: Liste complète des événements
+ * - filteredEvents: Événements filtrés par mois actuel
+ * - selectedMonth: Mois actuellement sélectionné (YearMonth)
+ * - isLoading: Indicateur de chargement
+ *
+ * Méthodes:
+ * - goToPreviousMonth(): Navigue au mois précédent
+ * - goToNextMonth(): Navigue au mois suivant
+ * - selectMonth(yearMonth): Sélectionne un mois spécifique
+ * - refreshEvents(): Recharge les événements
+ *
+ * Logique de filtrage:
+ * - Compare le mois et l'année de l'événement avec le mois sélectionné
+ * - Parse la date de l'événement (format attendu: "dd/MM/yyyy")
+ * - Filtre automatiquement lors du changement de mois
+ *
+ * Utilisation:
+ * - Utilisé par CalendarScreen pour affichage du calendrier
+ * - Navigation mois par mois avec flèches
+ * - Liste des événements mise à jour automatiquement
+ */
+
 class CalendarViewModel : ViewModel() {
     private val repository = FirestoreRepository()
 

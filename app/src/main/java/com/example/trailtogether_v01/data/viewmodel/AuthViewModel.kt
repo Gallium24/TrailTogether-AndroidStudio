@@ -31,14 +31,48 @@ sealed class AuthState {
 }
 
 /**
- * AuthViewModel gère toute la logique liée à l'authentification des utilisateurs.
- * Il expose l'état d'authentification (AuthState) et fournit des méthodes pour :
- * - Se connecter avec email/mot de passe.
- * - S'inscrire avec email/mot de passe.
- * - Se connecter avec un compte Google.
- * - Se déconnecter.
- * Il interagit avec FirebaseAuth pour effectuer ces opérations.
+ * AuthViewModel.kt
+ *
+ * Gère toute la logique d'authentification des utilisateurs.
+ *
+ * États d'authentification (AuthState sealed class):
+ * - Idle: État initial
+ * - Loading: En cours d'authentification
+ * - Success(user): Authentification réussie
+ * - Error(message): Erreur d'authentification
+ *
+ * Fonctionnalités:
+ * - Connexion email/mot de passe
+ * - Inscription email/mot de passe avec validation
+ * - Connexion Google Sign-In
+ * - Déconnexion
+ * - Vérification état de connexion au démarrage
+ *
+ * Méthodes principales:
+ * - login(email, password): Connexion classique
+ * - register(email, password, name): Inscription nouveau compte
+ * - signInWithGoogle(credential): Connexion avec Google
+ * - signOut(): Déconnexion
+ * - checkAuthState(): Vérifie si utilisateur déjà connecté
+ *
+ * Gestion Google Sign-In:
+ * - Configuration GoogleSignInClient dans le ViewModel
+ * - Génération du Intent de connexion
+ * - Traitement du résultat d'authentification
+ *
+ * Intégration Firebase:
+ * - FirebaseAuth pour authentification
+ * - FirestoreRepository pour création/récupération profil utilisateur
+ * - Création automatique du profil lors de l'inscription
+ *
+ * StateFlow exposé:
+ * - authState: État courant de l'authentification
+ *
+ * Utilisation:
+ * - Observé par RootNavGraph pour navigation auth/main
+ * - Utilisé par LoginScreen et RegisterScreen
  */
+
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth: FirebaseAuth = Firebase.auth

@@ -22,6 +22,52 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
+/**
+ * CreateEventScreen.kt
+ *
+ * Écran de création d'un événement de randonnée en groupe.
+ *
+ * Fonctionnalités:
+ * - Formulaire de création d'événement
+ * - Lien automatique avec un sentier sélectionné
+ * - Sélection de la date et de l'heure
+ * - Configuration du nombre de participants
+ * - Description de l'événement
+ *
+ * Champs:
+ * - Nom de l'événement: TextField
+ * - Sentier: Affiché (passé en paramètre, non éditable)
+ * - Date: DatePicker
+ * - Heure: TimePicker
+ * - Description: TextField multilignes
+ * - Nombre max de participants: Slider ou NumberPicker
+ *
+ * Validation:
+ * - Nom: Requis, minimum 3 caractères
+ * - Date: Doit être future
+ * - Heure: Format valide
+ * - Participants: Minimum 2, maximum 100
+ *
+ * Boutons:
+ * - "Créer l'événement": Sauvegarde dans Firestore
+ * - "Annuler": Retour sans sauvegarder
+ *
+ * Process de création:
+ * 1. Validation des champs
+ * 2. Création de l'objet Event
+ * 3. Sauvegarde dans Firestore via CalendarViewModel
+ * 4. L'organisateur est automatiquement ajouté aux participants
+ * 5. Navigation vers CalendarScreen ou EventDetailScreen
+ *
+ * Paramètres requis:
+ * - trailId: ID du sentier (passé depuis TrailDetailScreen)
+ * - trailName: Nom du sentier (pour affichage)
+ *
+ * Utilisation:
+ * - Navigation depuis TrailDetailScreen (bouton "Planifier un événement")
+ * - Partie de MainNavGraph
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEventScreen(
@@ -79,7 +125,6 @@ fun CreateEventScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ... (Champs Date, Time, Description inchangés) ...
             Text("Quand souhaitez-vous partir ?", style = MaterialTheme.typography.titleMedium)
 
             OutlinedTextField(
@@ -117,12 +162,10 @@ fun CreateEventScreen(
                         scope.launch {
                             val user = auth.currentUser
 
-                            // 1. Si on a le trail (OSM), on le sauvegarde dans Firestore pour que tout le monde puisse voir la carte
                             if (trail != null) {
                                 repository.saveTrail(trail)
                             }
 
-                            // 2. On crée l'événement avec les infos complètes (distance, durée)
                             val newEvent = Event(
                                 trailId = trailId,
                                 trailName = trailName,

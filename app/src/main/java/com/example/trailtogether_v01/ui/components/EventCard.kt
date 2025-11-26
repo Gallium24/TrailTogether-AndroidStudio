@@ -20,8 +20,43 @@ import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
 
 /**
- * EventCard est une composante qui représente une carte d'événement.
+ * EventCard.kt
+ *
+ * Carte affichant les informations d'un événement de randonnée.
+ *
+ * Informations affichées:
+ * - Nom de l'événement
+ * - Nom du sentier associé (cliquable → TrailDetailScreen)
+ * - Date et heure
+ * - Nom de l'organisateur
+ * - Nombre de participants / maximum
+ * - Badge de difficulté
+ *
+ * Interactions:
+ * - Clic sur la card → EventDetailScreen (détails + inscription)
+ * - Clic sur nom du sentier → TrailDetailScreen
+ *
+ * Indicateurs visuels:
+ * - Badge de difficulté avec couleur appropriée
+ * - Icônes: Date, Heure, Organisateur, Participants
+ * - Barre de progression participants (si implémenté)
+ *
+ * Design:
+ * - Card Material 3 avec élévation
+ * - Coins arrondis (16.dp)
+ * - Padding interne (16.dp)
+ * - Couleur de fond: Surface
+ *
+ * Paramètres:
+ * - event: Objet Event à afficher
+ * - onClick: Action lors du clic sur la card
+ * - onTrailClick: Action lors du clic sur le nom du sentier
+ *
+ * Utilisation:
+ * - Utilisé dans CalendarScreen (liste d'événements)
+ * - Affiché dans LazyColumn avec espacement
  */
+
 @Composable
 fun EventCard(
     event: Event,

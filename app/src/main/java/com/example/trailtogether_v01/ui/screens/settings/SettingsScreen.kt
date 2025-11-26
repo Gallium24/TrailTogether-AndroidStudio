@@ -24,6 +24,80 @@ import com.example.trailtogether_v01.utils.SettingsManager
 import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.modules.SqlTileWriter
 
+/**
+ * SettingsScreen.kt
+ *
+ * Écran des paramètres de l'application.
+ *
+ * Fonctionnalités:
+ * - Configuration de l'apparence (mode sombre)
+ * - Configuration des unités de mesure (métriques/impériales)
+ * - Configuration du rayon de recherche des sentiers
+ * - Configuration du style de carte
+ * - Gestion de l'affichage des tracés
+ * - Configuration du contact d'urgence
+ *
+ * Sections:
+ *
+ * 1. Apparence:
+ *    - Mode sombre: Switch
+ *    - Description: "Activer le thème sombre"
+ *
+ * 2. Unités:
+ *    - Unités impériales: Switch
+ *    - Description: "Utiliser miles au lieu de kilomètres"
+ *    - Impact: Distances, vitesses
+ *
+ * 3. Carte:
+ *    - Rayon de recherche: Slider (1-100 km)
+ *      - Valeur actuelle affichée
+ *      - Mise à jour en temps réel
+ *    - Style de carte: Dropdown
+ *      - Options: Mapnik (défaut), OpenTopoMap, etc.
+ *    - Afficher tracés: Switch
+ *      - Description: "Afficher les chemins sur la carte"
+ *
+ * 4. Sécurité:
+ *    - Contact d'urgence: TextField
+ *    - Format: Numéro de téléphone
+ *    - Validation: Format téléphone valide
+ *    - Utilisé pour EmergencyDialog
+ *
+ * 5. Compte:
+ *    - Bouton "Se déconnecter" (couleur rouge)
+ *
+ * Persistance:
+ * - Toutes les modifications sont sauvegardées automatiquement
+ * - Utilise SettingsManager (DataStore Preferences)
+ * - Pas de bouton "Sauvegarder" nécessaire
+ *
+ * Effets immédiats:
+ * - Mode sombre: Changement instantané du thème
+ * - Unités: Mise à jour immédiate des distances affichées
+ * - Rayon: Rechargement des sentiers au changement
+ * - Style carte: Changement des tuiles sur HomeScreen
+ * - Tracés: Toggle visibilité sur la carte
+ *
+ * Validation:
+ * - Contact d'urgence: Format téléphone (si renseigné)
+ * - Rayon: Limité entre 1 et 100 km
+ *
+ * Layout:
+ * - Header: Titre "Paramètres" + bouton retour
+ * - Sections groupées avec dividers
+ * - ScrollView pour support de nombreux paramètres
+ *
+ * Intégration:
+ * - SettingsViewModel pour state management
+ * - SettingsManager pour persistence
+ * - Impact sur: Theme, HomeScreen, TrailCard, FormatUtils
+ *
+ * Utilisation:
+ * - Navigation depuis ProfileScreen (bouton "Paramètres")
+ * - Navigation depuis HomeScreen (icône paramètres)
+ * - Partie de MainNavGraph
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(

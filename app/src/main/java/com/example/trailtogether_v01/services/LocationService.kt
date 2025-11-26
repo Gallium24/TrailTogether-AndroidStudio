@@ -14,6 +14,51 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import org.osmdroid.util.GeoPoint
 import kotlin.coroutines.resume
 
+/**
+ * LocationService.kt
+ *
+ * Service de gestion de la géolocalisation de l'utilisateur.
+ *
+ * Fonctionnalités:
+ * - Récupération de la position GPS actuelle
+ * - Demande de permissions de localisation
+ * - Sauvegarde de la dernière position connue
+ * - Fallback vers position par défaut si nécessaire
+ * - Gestion du consentement utilisateur (demandé une seule fois)
+ *
+ * Constantes:
+ * - DEFAULT_LOCATION: Saguenay, QC (48.4284°N, 71.0598°O)
+ *
+ * Méthodes:
+ * - hasLocationPermission(context): Vérifie si permissions accordées
+ * - getCurrentLocation(context): Récupère position actuelle ou défaut
+ * - getLastKnownLocation(context): Dernière position connue du système
+ * - saveLocationToPreferences(context, location): Sauvegarde position
+ * - getSavedLocation(context): Récupère position sauvegardée
+ * - wasLocationPermissionAsked(context): Vérifie si permission déjà demandée
+ *
+ * Permissions requises:
+ * - ACCESS_FINE_LOCATION: Localisation précise (GPS)
+ * - ACCESS_COARSE_LOCATION: Localisation approximative (réseau)
+ *
+ * Comportement:
+ * - Premier lancement: Demande permission → sauvegarde résultat
+ * - Lancements suivants: Utilise position sauvegardée ou défaut
+ * - Si permission refusée: Utilise DEFAULT_LOCATION
+ * - Si GPS désactivé: Utilise dernière position connue ou défaut
+ *
+ * Intégration:
+ * - FusedLocationProviderClient pour récupération GPS
+ * - SharedPreferences pour persistance
+ * - Appelé par MainActivity au démarrage
+ * - Position transmise à HomeViewModel
+ *
+ * Utilisation:
+ * - Initialisation dans MainActivity.onCreate()
+ * - Détermine position de départ de la carte dans HomeScreen
+ * - Définit le centre initial pour loadMapTrails()
+ */
+
 object LocationService {
 
     private const val TAG = "LocationService"
@@ -41,7 +86,6 @@ object LocationService {
      */
     suspend fun getCurrentLocation(context: Context): GeoPoint {
         if (!hasLocationPermission(context)) {
-            Log.w(TAG, "⚠️ Permissions de localisation non accordées")
             return DEFAULT_LOCATION
         }
 
@@ -53,14 +97,11 @@ object LocationService {
 
             if (location != null) {
                 val geoPoint = GeoPoint(location.latitude, location.longitude)
-                Log.d(TAG, "✅ Position trouvée: ${geoPoint.latitude}, ${geoPoint.longitude}")
                 geoPoint
             } else {
-                Log.w(TAG, "⚠️ Aucune position connue, utilisation position par défaut")
                 DEFAULT_LOCATION
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Erreur récupération position", e)
             DEFAULT_LOCATION
         }
     }
@@ -96,7 +137,6 @@ object LocationService {
                 cancellationTokenSource.cancel()
             }
         } catch (e: SecurityException) {
-            Log.e(TAG, "❌ SecurityException", e)
             continuation.resume(null)
         }
     }

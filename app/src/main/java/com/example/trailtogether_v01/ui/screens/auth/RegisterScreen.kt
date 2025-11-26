@@ -26,11 +26,51 @@ import com.example.trailtogether_v01.data.viewmodel.AuthState
 import com.example.trailtogether_v01.ui.theme.TrailGreen
 
 /**
- * RegisterScreen est la composante de l'écran d'inscription de l'utilisateur.
- * @param authState L'état d'authentification de l'utilisateur.
- * @param onRegisterClick Une fonction lambda appelée lorsque l'utilisateur clique sur le bouton "S'inscrire".
- * @param onNavigateToLogin Une fonction lambda appelée lorsque l'utilisateur clique sur le lien "Déjà un compte ? Se connecter".
+ * RegisterScreen.kt
+ *
+ * Écran d'inscription de nouveaux utilisateurs.
+ *
+ * Fonctionnalités:
+ * - Création de compte avec email, mot de passe et nom
+ * - Validation des champs en temps réel
+ * - Confirmation du mot de passe
+ * - Navigation vers LoginScreen
+ * - Création automatique du profil utilisateur
+ *
+ * Champs:
+ * - Nom complet: TextField
+ * - Email: TextField avec validation format
+ * - Mot de passe: TextField avec masquage
+ * - Confirmation mot de passe: TextField avec masquage
+ *
+ * Validation:
+ * - Nom: Minimum 2 caractères
+ * - Email: Format email valide
+ * - Mot de passe: Minimum 6 caractères
+ * - Confirmation: Doit correspondre au mot de passe
+ * - Affichage des erreurs sous chaque champ
+ *
+ * Boutons:
+ * - "S'inscrire": Crée le compte
+ * - "Déjà un compte ?": Navigation vers LoginScreen
+ *
+ * États:
+ * - Idle: Formulaire actif
+ * - Loading: CircularProgressIndicator + bouton désactivé
+ * - Success: Navigation automatique vers MainNavGraph
+ * - Error: Message d'erreur affiché
+ *
+ * Process d'inscription:
+ * 1. Validation des champs
+ * 2. Création du compte Firebase Auth
+ * 3. Création du profil dans Firestore
+ * 4. Navigation automatique vers l'app
+ *
+ * Utilisation:
+ * - Navigation depuis LoginScreen
+ * - Partie de AuthNavGraph
  */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
