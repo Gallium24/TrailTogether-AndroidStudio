@@ -20,11 +20,13 @@ import com.example.trailtogether_v01.data.models.Difficulty
 import com.example.trailtogether_v01.data.models.Trail
 import com.example.trailtogether_v01.ui.theme.SurfaceBeige
 import com.example.trailtogether_v01.ui.theme.TextDark
+import com.example.trailtogether_v01.utils.FormatUtils
 
 @Composable
 fun TrailCard(
     trail: Trail,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    useImperialUnits: Boolean = false
 ) {
     Card(
         modifier = Modifier
@@ -78,7 +80,7 @@ fun TrailCard(
             ) {
                 TrailStat(
                     icon = Icons.Default.DirectionsWalk,
-                    value = trail.distance.toString()
+                    value = FormatUtils.formatDistance(trail.distance, useImperialUnits)
                 )
                 TrailStat(
                     icon = Icons.Default.Schedule,

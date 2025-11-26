@@ -37,6 +37,15 @@ import android.graphics.Paint
 import com.example.trailtogether_v01.data.models.Difficulty
 import com.example.trailtogether_v01.data.models.Trail
 import android.util.Log
+import com.example.trailtogether_v01.utils.FormatUtils
+import com.example.trailtogether_v01.utils.SettingsManager
+import kotlinx.coroutines.flow.first
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun TrailDetailScreen(
@@ -47,17 +56,16 @@ fun TrailDetailScreen(
     detailViewModel: TrailDetailViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var useImperialUnits by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        useImperialUnits = SettingsManager.useImperialUnits.first()
+    }
     LaunchedEffect(key1 = trailId, key2 = preloadedTrail) {
-        Log.d("TrailDetailScreen", "LaunchedEffect déclenché")
-        Log.d("TrailDetailScreen", "  - trailId: $trailId")
-        Log.d("TrailDetailScreen", "  - preloadedTrail: ${preloadedTrail?.name ?: "null"}")
-
         if (preloadedTrail != null) {
-            Log.d("TrailDetailScreen", "Utilisation du preloadedTrail")
             detailViewModel.setTrail(preloadedTrail)
         } else {
-            Log.d("TrailDetailScreen", "Pas de preloadedTrail, recherche Firestore")
             detailViewModel.fetchTrailById(trailId)
         }
     }
@@ -220,7 +228,7 @@ fun TrailDetailScreen(
                                 StatColumn(
                                     icon = Icons.Default.DirectionsWalk,
                                     label = "Distance",
-                                    value = t.distance.toString()
+                                    value = FormatUtils.formatDistance(t.distance, useImperialUnits)
                                 )
                                 StatColumn(
                                     icon = Icons.Default.Schedule,

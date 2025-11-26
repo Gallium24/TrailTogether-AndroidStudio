@@ -52,6 +52,7 @@ import kotlinx.coroutines.launch
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.createBitmap
 import com.example.trailtogether_v01.data.viewmodel.SettingsViewModel
+import com.example.trailtogether_v01.utils.FormatUtils
 import com.example.trailtogether_v01.utils.MapUtils.OpenTopoMapSource
 import com.example.trailtogether_v01.utils.SettingsManager
 import kotlinx.coroutines.delay
@@ -348,7 +349,7 @@ fun HomeScreen(
                             Text(trail.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Chip(trail.distance.toString())
+                                Chip(FormatUtils.formatDistance(trail.distance, useImperial))
                                 Chip(trail.duration)
                                 Chip(trail.difficulty.toDisplayString())
                             }
@@ -403,7 +404,8 @@ fun HomeScreen(
                             homeViewModel.selectTrail(trail.id)
                         }
                         onNavigateToTrailDetail(trail.id)
-                    }
+                    },
+                    useImperialUnits = useImperial
                 )
             }
         }
